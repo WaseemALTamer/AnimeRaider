@@ -75,6 +75,13 @@ namespace AnimeRaider.UI
         }
 
 
+        private static Pages.Player? _UIPlayer;
+        public static Pages.Player? UIPlayer{
+            get { return _UIPlayer; }
+            set { _UIPlayer = value; }
+        }
+
+
 
 
         // <POPUPS>
@@ -135,6 +142,10 @@ namespace AnimeRaider.UI
             // this creates the Series Page
             UISearch = new Pages.Search(Master);
             Pages.Add(UISearch);
+
+            // this creates the Player Page
+            UIPlayer = new Pages.Player(Master);
+            Pages.Add(UIPlayer);
 
 
             // <PAGES END>

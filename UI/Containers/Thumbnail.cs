@@ -10,6 +10,7 @@ using SkiaSharp;
 using Avalonia;
 using System.Text.RegularExpressions;
 using System;
+using System.Diagnostics;
 
 
 
@@ -439,14 +440,10 @@ namespace AnimeRaider.UI.Containers
         }
 
 
-        private void OnClick(object? sender, PointerReleasedEventArgs e)
-        {
-
+        private void OnClick(object? sender, PointerReleasedEventArgs e){
             e.Handled = true;
-            if (e.GetCurrentPoint(null).Properties.PointerUpdateKind == PointerUpdateKind.LeftButtonReleased)
-            {
-                if (sender is Control control)
-                {
+            if (e.GetCurrentPoint(null).Properties.PointerUpdateKind == PointerUpdateKind.LeftButtonReleased){
+                if (sender is Control control){
                     var pointerPosition = e.GetPosition(control);
                     if (pointerPosition.X < 0 || pointerPosition.Y < 0) return;
                     if (pointerPosition.X > Width || pointerPosition.Y > Height) return;
@@ -455,12 +452,36 @@ namespace AnimeRaider.UI.Containers
                     SharedData.TargetedData.Episode = Episode;
 
                     // Transition to the next window
-                    if (PublicWidgets.UISeries != null)
-                    {
-                        //PublicWidgets.TransitionForward(PublicWidgets.UISeries);
+                    //if (PublicWidgets.UIPlayer != null){
+                    //PublicWidgets.TransitionForward(PublicWidgets.UIPlayer);
+                    //}
+
+                    // simple methode to open vlc and play the video that you clicked on
+
+                    if (SharedData.TargetedData.Series == null || SharedData.TargetedData.Series.Name == null) {
+                        return;
                     }
 
+                    if (SharedData.TargetedData.Episode == null || SharedData.TargetedData.Episode.Name == null){
+                        return;
+                    }
 
+                    var series = Uri.EscapeDataString(SharedData.TargetedData.Series.Name);
+                    var episode = Uri.EscapeDataString(SharedData.TargetedData.Episode.Name);
+
+                    var psi = new ProcessStartInfo{
+                        FileName = @"vlc", // Use @ to avoid escaping backslashes
+                        Arguments = Network.Server.Domain + Network.Server.Watch + $"/{series}/{episode}", // Quote the whole URL argument
+                        UseShellExecute = true,
+                        CreateNoWindow = true
+                    };
+
+                    try{
+                        Process.Start(psi);
+                    }
+                    catch (Exception ex){
+                        Console.WriteLine("Failed to launch VLC: " + ex.Message);
+                    }
 
                 }
             }

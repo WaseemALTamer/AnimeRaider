@@ -19,6 +19,8 @@ namespace AnimeRaider.Network
 
         public static string Search = "search";
 
+        public static string Watch = "watch";
+
 
     }
 }
