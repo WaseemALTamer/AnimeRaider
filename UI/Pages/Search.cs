@@ -24,29 +24,38 @@ namespace AnimeRaider.UI.Pages
             if (MainCanvas == null) return;
 
 
-            if (Master != null)
-            {
+            
+
+
+            if (Master != null){
                 Master.SizeChanged += OnSizeChanged;
             }
 
             if (ScrollViewer != null)
                 ScrollViewer.PropertyChanged += OnPropertyChanged;
 
+            //OnHide += RemoveAllPosters; // we dont kill them on hide this is used for testing only
+
         }
 
+
+        bool _updateRunning = false;
+        bool _break = false;
         public async void Update(string search){
 
+            while (_updateRunning == true) {
+                _break = true;
+                await Task.Delay(50);
+            }
+
+            _updateRunning = true;
             RemoveAllPosters();
 
             SharedData.Data.RandomSeries = await Network.Requester.GetSearchSeries(search);
-            if (SharedData.Data.RandomSeries != null)
-            {
-
-                for (int i = 0; i < SharedData.Data.RandomSeries.Count; i++)
-                {
+            if (SharedData.Data.RandomSeries != null){
+                for (int i = 0; i < SharedData.Data.RandomSeries.Count; i++){
                     Poster poster = new Poster(MainCanvas, SharedData.Data.RandomSeries[i]);
                     Posters.Add(poster);
-
                     if (MainCanvas != null){
                         MainCanvas.Children.Add(poster);
                     }
@@ -55,20 +64,26 @@ namespace AnimeRaider.UI.Pages
 
                     await Task.Delay(50);
 
+                    if (_break) {
+                        _break = false; 
+                        break;
+                    }
                 }
             }
+
+            _updateRunning = false; 
         }
 
 
         public void RemoveAllPosters() {
-
             if (MainCanvas == null) return;
 
             for (int i = 0; i < Posters.Count; i++) { 
                 var poster = Posters[i];
-                MainCanvas.Children.Remove(poster);
+                poster.Kill();
             }
 
+            MainCanvas.Height = 0;
             
             Posters.Clear();
             GC.Collect();

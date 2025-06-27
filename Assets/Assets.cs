@@ -29,6 +29,7 @@ namespace AnimeRaider
         public static Bitmap? WifiBitmap;
         public static Bitmap? SearchBitmap;
         public static Bitmap? ChainsBitmap;
+        public static Bitmap? PlayBitmap;
         
 
 
@@ -61,6 +62,7 @@ namespace AnimeRaider
             WifiBitmap = new Bitmap("Assets/Images/Wifi.png");
             SearchBitmap = new Bitmap("Assets/Images/Search.png");
             ChainsBitmap = new Bitmap("Assets/Images/Chains.png");
+            PlayBitmap = new Bitmap("Assets/Images/Play.png");
 
 
             // we finnish loading the assests here

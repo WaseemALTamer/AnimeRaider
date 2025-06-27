@@ -39,6 +39,7 @@ namespace AnimeRaider.UI.Containers
 
 
             Entry = new TextBox {
+                Text = "",
                 Width = 300,
                 Height = 40,
                 FontSize = Config.FontSize,

@@ -24,6 +24,7 @@ namespace AnimeRaider.UI.Pages
 
             Loaded += OnLoaded;
 
+
             if (Master != null) {
                 Master.SizeChanged += OnSizeChanged;
             }
@@ -52,6 +53,20 @@ namespace AnimeRaider.UI.Pages
 
                 }
             }
+        }
+
+
+        public void RemoveAllPosters(){
+            if (MainCanvas == null) return;
+
+            for (int i = 0; i < Posters.Count; i++){
+                var poster = Posters[i];
+                poster.Kill();
+                MainCanvas.Children.Remove(poster);
+            }
+
+            Posters.Clear();
+            GC.Collect();
         }
 
 

@@ -19,6 +19,7 @@ namespace AnimeRaider.Setting{
         };
 
         public static SolidColorBrush Page = new SolidColorBrush(Color.FromUInt32(0x7f1f1f1f));
+        public static SolidColorBrush Holder = new SolidColorBrush(Color.FromUInt32(0x7f222222));
         public static SolidColorBrush Poster = new SolidColorBrush(Color.FromUInt32(0xff1f1f1f));
 
         public static SolidColorBrush DimOverlay = new SolidColorBrush(Color.FromUInt32(0x7f1f1f1f));

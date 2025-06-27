@@ -179,8 +179,7 @@ namespace AnimeRaider.UI
         }
 
         private static bool _TransitionBackRunning = false; // for thread safty
-        public static async void TransitionBack()
-        {
+        public static async void TransitionBack(){
             if (_TransitionBackRunning) return;
             _TransitionBackRunning = true;
             if (PagesHistory.Count > 0 &&

@@ -1,5 +1,6 @@
 ﻿using AnimeRaider.Structures;
 using System.Threading.Tasks;
+using Avalonia.Media.Imaging;
 using AnimeRaider.Setting;
 using Avalonia.Controls;
 using Avalonia.Media;
@@ -7,8 +8,8 @@ using Avalonia.Input;
 using SkiaSharp;
 using Avalonia;
 using System.IO;
-using Avalonia.Media.Imaging;
-using System;
+using Avalonia.Markup.Xaml;
+
 
 
 
@@ -57,6 +58,13 @@ namespace AnimeRaider.UI.Containers
             set { _Cover = value; }
         }
 
+        private Bitmap? _CoverBitmap;
+        public Bitmap? CoverBitmap
+        {
+            get { return _CoverBitmap; }
+            set { _CoverBitmap = value; }
+        }
+
 
         public Poster(Canvas? master, Series? series){
             Master = master;
@@ -100,7 +108,9 @@ namespace AnimeRaider.UI.Containers
             };
 
             MainCanvas.Children.Add(Cover);
-            Loaded += OnLoaded;
+            //Loaded += OnLoaded; // instead  of loading  the  content when we create
+                                  // the poseter we load the content when we show the
+                                  // content 
 
 
             if (Master != null){
@@ -113,7 +123,15 @@ namespace AnimeRaider.UI.Containers
         }
 
 
+        bool _loaded = false;
         private async void OnLoaded(object? sender = null, object? e = null){
+
+            if (_loaded) {
+                return;
+            }
+
+            _loaded = true;
+
             if (Series == null ||
                 Series.Cover == null ||
                 Cover == null) return;
@@ -121,8 +139,7 @@ namespace AnimeRaider.UI.Containers
 
             int targetWidth = (int)(Width * 1.4);  // capture UI property on UI thread
             // Run the image download and resizing off the UI thread
-            MemoryStream? imageStream = await Task.Run(async () =>
-            {
+            MemoryStream? imageStream = await Task.Run(async () =>{
                 SKBitmap? loaded = await Network.Requester.GetImage(Series.Cover);
                 if (loaded == null) return null;
 
@@ -134,7 +151,9 @@ namespace AnimeRaider.UI.Containers
 
             // Set the Avalonia image source on the UI thread
             using (imageStream) {
-                Cover.Source = new Bitmap(imageStream);
+
+                CoverBitmap = new Bitmap(imageStream);
+                Cover.Source = CoverBitmap;
 
                 if (MainCanvas != null) {
 
@@ -145,11 +164,13 @@ namespace AnimeRaider.UI.Containers
                     Cover.Height = MainCanvas.Height;
                 }
             }
+
+            // just in case the using doesnt dispose of the stream
+            imageStream.Dispose();
         }
 
 
-        public void OnSizeChanged(object? sender = null, SizeChangedEventArgs? e = null)
-        {
+        public void OnSizeChanged(object? sender = null, SizeChangedEventArgs? e = null){
             if (Master != null){
                 Width = 270;
                 Height = 405;
@@ -160,6 +181,7 @@ namespace AnimeRaider.UI.Containers
 
         public void Show(){
             if (Opacity == 1) return;
+            OnLoaded();
 
             if (ShowHideTransition != null)
                 ShowHideTransition.TranslateForward();
@@ -174,11 +196,59 @@ namespace AnimeRaider.UI.Containers
 
         private bool IsKill = false;
         public void Kill(){
-            if (ShowHideTransition != null)
-            {
+
+
+            
+
+            if (ShowHideTransition != null){
                 ShowHideTransition.TranslateBackward();
                 IsKill = true;
             }
+        }
+
+        public void Dispose(){
+
+            if (HoverTranslation != null) {
+                PointerEntered -= HoverTranslation.TranslateForward;
+                PointerExited -= HoverTranslation.TranslateBackward;
+            }
+
+            HoverTranslation = null;
+            ShowHideTransition = null;
+            PostionTranslation = null;
+
+            // Detach events
+
+            PointerReleased -= OnClick;
+            //Loaded -= OnLoaded;
+
+            if (Master != null)
+            {
+                Master.SizeChanged -= OnSizeChanged;
+            }
+
+            // Clear children
+            
+
+            if (MainCanvas != null) {
+                MainCanvas.Children.Clear();
+            }
+
+
+            if (Cover != null && CoverBitmap != null) {
+                CoverBitmap.Dispose();
+                Cover.Source = null;
+            }
+
+
+            // Null out references
+            Cover = null!;
+            MainCanvas = null!;
+            Series = null!;
+            Master = null!;
+            HoverTranslation = null!;
+            ShowHideTransition = null!;
+            Child = null!;
         }
 
         public void ShowHideSetOpeicity(double Value)
@@ -191,18 +261,20 @@ namespace AnimeRaider.UI.Containers
 
             Opacity = Value;
 
-            IsVisible = Opacity != 0; // reducndency line for the Avoilonia Thread to ignore the window when not needed
             if (Opacity == 0 &&
                 IsKill == true &&
                 ShowHideTransition != null &&
                 ShowHideTransition.FunctionRunning == false &&
                 Master != null)
-            { 
-                
-              // this if statment just checks if the user want to kill this object and removes it
-              // from its parent
+            {
+
+                // this if statment just checks if the user want to kill this object and removes it
+                // from its parent
 
                 Master.Children.Remove(this);
+                Dispose();
+
+                
 
             }
         }
@@ -269,7 +341,7 @@ namespace AnimeRaider.UI.Containers
             {
                 StartingValue = 0,
                 EndingValue = 1,
-                Duration = Config.TransitionDuration / 2,
+                Duration = Config.TransitionDuration,
                 Trigger = SetPostionTrigger
             };
 
@@ -306,13 +378,12 @@ namespace AnimeRaider.UI.Containers
 
 
                     SharedData.TargetedData.Series = Series;
+                    SharedData.TargetedData.CoverImage = CoverBitmap;
 
                     // Transition to the next window
                     if (PublicWidgets.UISeries != null){
                         PublicWidgets.TransitionForward(PublicWidgets.UISeries);
                     }
-
-
 
                 }
             }
