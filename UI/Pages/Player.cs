@@ -11,8 +11,8 @@ namespace AnimeRaider.UI.Pages
 {
     public class Player : Base
     {
-        private LibVLC? _libVLC;
-        private MediaPlayer? _mediaPlayer;
+        //private LibVLC? _libVLC;
+        //private MediaPlayer? _mediaPlayer;
 
         public Player(Canvas? master) : base(master)
         {

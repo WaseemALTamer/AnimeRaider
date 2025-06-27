@@ -18,6 +18,18 @@ namespace AnimeRaider.Network
 
         public static HttpClient client = new HttpClient();
 
+        public static async Task<bool> GetPing(){
+            try{
+                string url = Server.Domain + Server.Ping;
+                using var response = await client.GetAsync(url);
+                return response.IsSuccessStatusCode;
+            }
+            catch{
+                return false;
+            }
+        }
+
+
         public static async Task<List<Series>?> GetAllSeries(){
             string url = Server.Domain + Server.All;
             try{
@@ -46,8 +58,7 @@ namespace AnimeRaider.Network
         public static async Task<List<Series>?> GetRandomSeries(int number = 12)
         {
             string url = Server.Domain + Server.Random + "?" + "&number=" + number;
-            try
-            {
+            try{
                 HttpResponseMessage response = await client.GetAsync(url);
                 response.EnsureSuccessStatusCode();
 

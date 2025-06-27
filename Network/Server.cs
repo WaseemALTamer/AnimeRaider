@@ -11,7 +11,10 @@ namespace AnimeRaider.Network
         // this class will just provide Domain data for the database
 
 
-        public static string Domain = "http://127.0.0.1:8000/";
+        public static string Domain = "http://192.168.1.51:8000/";
+
+
+        public static string Ping = "ping";
 
         public static string All = "all"; // this is a path that gets all the series
 

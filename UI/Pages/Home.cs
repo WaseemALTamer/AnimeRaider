@@ -9,8 +9,7 @@ using System;
 
 namespace AnimeRaider.UI.Pages
 {
-    public class Home : Base
-    {
+    public class Home : Base{
 
         public List<Poster> Posters = new List<Poster>();
 
@@ -22,7 +21,7 @@ namespace AnimeRaider.UI.Pages
         public Home(Canvas? master) : base(master){
             if (MainCanvas == null) return;
 
-            Loaded += OnLoaded;
+            OnShow += Update;
 
 
             if (Master != null) {
@@ -34,8 +33,10 @@ namespace AnimeRaider.UI.Pages
 
         }
 
-        private async void OnLoaded(object? sender=null, object? e=null)
-        {
+        private async void Update(){
+
+            RemoveAllPosters();
+
             SharedData.Data.RandomSeries = await Network.Requester.GetRandomSeries(12);
             if (SharedData.Data.RandomSeries != null){
 

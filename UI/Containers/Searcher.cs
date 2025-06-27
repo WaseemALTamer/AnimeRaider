@@ -89,15 +89,19 @@ namespace AnimeRaider.UI.Containers
 
 
         bool IsShowing = false;
-        public void Show()
-        {
+        public void Show(){
+
+            if (IsShowing == true) return; 
+
             if (ShowHideTransation == null) return;
             IsShowing = true;
             ShowHideTransation.TranslateForward();
         }
 
-        public void Hide()
-        {
+        public void Hide() {
+
+            if (IsShowing == false) return;
+
             if (ShowHideTransation == null) return;
             IsShowing = false;
             ShowHideTransation.TranslateBackward();

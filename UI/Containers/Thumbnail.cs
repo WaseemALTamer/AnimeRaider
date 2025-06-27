@@ -472,7 +472,7 @@ namespace AnimeRaider.UI.Containers
                     var psi = new ProcessStartInfo{
                         FileName = @"vlc", // Use @ to avoid escaping backslashes
                         Arguments = Network.Server.Domain + Network.Server.Watch + $"/{series}/{episode}", // Quote the whole URL argument
-                        UseShellExecute = true,
+                        UseShellExecute = false,
                         CreateNoWindow = true
                     };
 

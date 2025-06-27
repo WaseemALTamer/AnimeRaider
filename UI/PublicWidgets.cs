@@ -53,6 +53,12 @@ namespace AnimeRaider.UI
 
 
         // <PAGES>
+        private static Pages.Credentials? _UICredentials;
+        public static Pages.Credentials? UICredentials{
+            get { return _UICredentials; }
+            set { _UICredentials = value; }
+        }
+
 
         private static Pages.Home? _UIHome;
         public static Pages.Home? UIHome{
@@ -101,7 +107,7 @@ namespace AnimeRaider.UI
 
 
 
-        public static void Initialize(AvaloniaObject master) {
+        public static async void Initialize(AvaloniaObject master) {
             var Master = master as Canvas;
             if (Master == null) return; // redundency if statment
 
@@ -130,6 +136,10 @@ namespace AnimeRaider.UI
 
 
             // <PAGES START>
+
+            UICredentials = new Pages.Credentials(Master);
+            Pages.Add(UICredentials);
+
 
             // this creates the Home Page
             UIHome = new Pages.Home(Master);
@@ -160,11 +170,14 @@ namespace AnimeRaider.UI
 
 
             // <SETUP START>
+            await Task.Delay(50); // wait for the rest of the ui to load up on boot
+                                  // this avoids certain errors for linux user
+
 
             BackButton.Show();
-            Searcher.Show();
-            TransitionForward(UIHome);
-            
+            //Searcher.Show();
+            TransitionForward(UICredentials);
+
             // <SETUP END>
         }
 
@@ -173,19 +186,16 @@ namespace AnimeRaider.UI
 
 
         private static bool _TransitionForwardRunning = false; // for thread safty
-        public static async void TransitionForward(Pages.Base Page)
-        {
+        public static async void TransitionForward(Pages.Base Page){
             if (_TransitionForwardRunning) return;
             _TransitionForwardRunning = true;
-            if (DisplayedPage != null)
-            {
-                PagesHistory.Add(DisplayedPage);
+            if (DisplayedPage != null){
                 DisplayedPage.Hide();
-                DisplayedPage = Page; // redundency
+                PagesHistory.Add(DisplayedPage);
                 await Task.Delay(Config.TransitionDuration / 2); // wait for at bit to give ot a smoother feel
             }
             DisplayedPage = Page;
-            Page.Show();
+            DisplayedPage.Show();
             _TransitionForwardRunning = false;
         }
 
