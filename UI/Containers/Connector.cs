@@ -5,6 +5,7 @@ using Avalonia.Media;
 using Avalonia.Input;
 using Avalonia;
 using System;
+using AnimeRaider.Network;
 
 
 
@@ -39,6 +40,8 @@ namespace AnimeRaider.UI.Containers{
 
 
         private Animations.Transations.Uniform? WrongHostnameTranstion;
+        private Animations.Transations.Uniform? WrongUsernameTranstion;
+        private Animations.Transations.Uniform? WrongPasswordTranstion;
 
         public Connector(Canvas? master) {
 
@@ -70,6 +73,7 @@ namespace AnimeRaider.UI.Containers{
 
 
             HostAdressEntry = new TextBox{
+                Text = "http://192.168.1.70:8000/", 
                 Width = 300,
                 Height = 40,
                 FontSize = Config.FontSize,
@@ -83,6 +87,7 @@ namespace AnimeRaider.UI.Containers{
 
             UsernameEntry = new TextBox
             {
+                Text = "",
                 Width = 300,
                 Height = 40,
                 FontSize = Config.FontSize,
@@ -95,6 +100,7 @@ namespace AnimeRaider.UI.Containers{
 
             PasswordEntry = new TextBox
             {
+                Text = "",
                 Width = 300,
                 Height = 40,
                 FontSize = Config.FontSize,
@@ -112,6 +118,23 @@ namespace AnimeRaider.UI.Containers{
                 EndingValue = 1,
                 Duration = Config.TransitionDuration,
                 Trigger = TriggerWrongHostname,
+            };
+
+
+            WrongUsernameTranstion = new Animations.Transations.Uniform
+            {
+                StartingValue = 0,
+                EndingValue = 1,
+                Duration = Config.TransitionDuration,
+                Trigger = TriggerWrongUsername,
+            };
+
+            WrongPasswordTranstion = new Animations.Transations.Uniform
+            {
+                StartingValue = 0,
+                EndingValue = 1,
+                Duration = Config.TransitionDuration,
+                Trigger = TriggerWrongPassword,
             };
 
             CredentialsImage = new Image{
@@ -218,6 +241,96 @@ namespace AnimeRaider.UI.Containers{
         }
 
 
+        private void TriggerWrongUsername(double value)
+        {
+            if (Background is SolidColorBrush solidBrush)
+            {
+                var originalColorEntry = Themes.Entry;
+                var targetColor = Themes.Wrong;
+
+                byte Lerp(byte start, byte end) => (byte)(start + (end - start) * value);
+
+                //var newColorEntry = Color.FromArgb(
+                //    Lerp(originalColorEntry.Color.A, targetColor.Color.A),
+                //    Lerp(originalColorEntry.Color.R, targetColor.Color.R),
+                //    Lerp(originalColorEntry.Color.G, targetColor.Color.G),
+                //    Lerp(originalColorEntry.Color.B, targetColor.Color.B)
+                //);
+
+                var originalColorText = Themes.Text;
+
+                var newColorText = Color.FromArgb(
+                    Lerp(originalColorText.Color.A, targetColor.Color.A),
+                    Lerp(originalColorText.Color.R, targetColor.Color.R),
+                    Lerp(originalColorText.Color.G, targetColor.Color.G),
+                    Lerp(originalColorText.Color.B, targetColor.Color.B)
+                );
+
+                if (UsernameEntry != null)
+                {
+                    // changing the color of the background is better but Avilonia doesnt document the c#
+                    // part of there code look into making your own text entry at  this point, prefarably
+                    // in the near future switch to the orginal sloution
+
+                    //Entry.Background = new SolidColorBrush(newColorEntry);
+                    UsernameEntry.Foreground = new SolidColorBrush(newColorText);
+                }
+
+                if (WrongUsernameTranstion != null &&
+                    WrongUsernameTranstion.FunctionRunning == false &&
+                    value == 1)
+                { // loop around and go back to normal
+                    WrongUsernameTranstion.TranslateBackward();
+                }
+            }
+        }
+
+
+        private void TriggerWrongPassword(double value)
+        {
+            if (Background is SolidColorBrush solidBrush)
+            {
+                var originalColorEntry = Themes.Entry;
+                var targetColor = Themes.Wrong;
+
+                byte Lerp(byte start, byte end) => (byte)(start + (end - start) * value);
+
+                //var newColorEntry = Color.FromArgb(
+                //    Lerp(originalColorEntry.Color.A, targetColor.Color.A),
+                //    Lerp(originalColorEntry.Color.R, targetColor.Color.R),
+                //    Lerp(originalColorEntry.Color.G, targetColor.Color.G),
+                //    Lerp(originalColorEntry.Color.B, targetColor.Color.B)
+                //);
+
+                var originalColorText = Themes.Text;
+
+                var newColorText = Color.FromArgb(
+                    Lerp(originalColorText.Color.A, targetColor.Color.A),
+                    Lerp(originalColorText.Color.R, targetColor.Color.R),
+                    Lerp(originalColorText.Color.G, targetColor.Color.G),
+                    Lerp(originalColorText.Color.B, targetColor.Color.B)
+                );
+
+                if (PasswordEntry != null)
+                {
+                    // changing the color of the background is better but Avilonia doesnt document the c#
+                    // part of there code look into making your own text entry at  this point, prefarably
+                    // in the near future switch to the orginal sloution
+
+                    //Entry.Background = new SolidColorBrush(newColorEntry);
+                    PasswordEntry.Foreground = new SolidColorBrush(newColorText);
+                }
+
+                if (WrongPasswordTranstion != null &&
+                    WrongPasswordTranstion.FunctionRunning == false &&
+                    value == 1)
+                { // loop around and go back to normal
+                    WrongPasswordTranstion.TranslateBackward();
+                }
+            }
+        }
+
+
         private void OnEnetryKeyDown(object? sender, KeyEventArgs? e){
             // this will  detect when  a key  is pressed  for the entery
             // this will be used to detect when the enter key is pressed
@@ -243,24 +356,58 @@ namespace AnimeRaider.UI.Containers{
             }
 
             Network.Server.Domain = HostAdressEntry.Text;
-
-
-
             bool result = await Network.Requester.GetPing();
-            if (result){
-                if(PublicWidgets.Searcher != null)
+            if (result)
+            {
+                if (PublicWidgets.Searcher != null)
                     PublicWidgets.Searcher.Show();
 
-                if (PublicWidgets.UIHome != null)
-                    PublicWidgets.TransitionForward(PublicWidgets.UIHome);
+
+                //if (PublicWidgets.UIHome != null)
+                //    PublicWidgets.TransitionForward(PublicWidgets.UIHome);
             }
-            else {
+            else
+            {
                 WrongHostnameTranstion.TranslateForward();
+                return;
             }
 
 
+            if (UsernameEntry != null &&
+                PasswordEntry != null &&
+                UsernameEntry.Text != null &&
+                PasswordEntry.Text != null) 
+            {
+                if (UsernameEntry.Text == "" && PasswordEntry.Text == "") {
+                    SharedData.Data.Username = UsernameEntry.Text;
+                    SharedData.Data.Password = PasswordEntry.Text;
+                    SharedData.Data.UserData = null;
+
+                    if (PublicWidgets.UIHome != null)
+                        PublicWidgets.TransitionForward(PublicWidgets.UIHome);
+                    return;
+                }
 
 
+                SharedData.Data.Username = UsernameEntry.Text;
+                SharedData.Data.Password = PasswordEntry.Text;
+
+                SharedData.Data.UserData = await Network.Requester.GetUserData(UsernameEntry.Text, PasswordEntry.Text);
+
+                if (SharedData.Data.UserData != null)
+                {
+                    if (PublicWidgets.UIHome != null)
+                        PublicWidgets.TransitionForward(PublicWidgets.UIHome);
+                }
+                else {
+                    if (WrongUsernameTranstion != null && WrongPasswordTranstion != null) {
+                        WrongUsernameTranstion.TranslateForward();
+                        WrongPasswordTranstion.TranslateForward();
+                    }
+                    
+                }
+
+            }
 
         }
 

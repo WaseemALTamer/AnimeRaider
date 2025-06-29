@@ -13,16 +13,28 @@ namespace AnimeRaider.Network
 
         public static string Domain = "http://192.168.1.51:8000/";
 
+        // General
+        public const string Ping = "ping";
+        public const string All = "all";       // gets all the series
+        public const string Random = "random"; // gives random shows
+        public const string Search = "search";
+        public const string Watch = "watch";
 
-        public static string Ping = "ping";
 
-        public static string All = "all"; // this is a path that gets all the series
+        // Users
+        public const string Users = "users/";
+        public const string Create = "create";
 
-        public static string Random = "random"; // this will give you random shows
 
-        public static string Search = "search";
+        public const string Data = "data/";
+        public const string AddSeries = "add_series";
+        public const string RemoveSeries = "remove_series";
 
-        public static string Watch = "watch";
+        public const string AddCompletedEpisode = "add_completed_episode";
+        public const string RemoveCompletedEpisode = "remove_completed_episode";
+
+        public const string AddBookmarkedEpisode = "add_bookmarked_episode";
+        public const string RemoveBookmarkedEpisode = "remove_bookmarked_episode";
 
 
     }

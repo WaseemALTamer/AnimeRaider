@@ -8,7 +8,9 @@ using System.Net.Http;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace AnimeRaider.Network
 {
@@ -21,7 +23,8 @@ namespace AnimeRaider.Network
         public static async Task<bool> GetPing(){
             try{
                 string url = Server.Domain + Server.Ping;
-                using var response = await client.GetAsync(url);
+                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(1));
+                using var response = await client.GetAsync(url, cts.Token);
                 return response.IsSuccessStatusCode;
             }
             catch{
@@ -136,6 +139,230 @@ namespace AnimeRaider.Network
         }
 
 
+        public static async Task<UserData?> GetUserData(string username, string password){
+            string url = Server.Domain + Server.Users + Server.Data + Server.All +  "?" + "&username=" + username + "&password=" + password;
+            try{
+                HttpResponseMessage response = await client.GetAsync(url);
+                response.EnsureSuccessStatusCode();
+
+                string responseBody = await response.Content.ReadAsStringAsync();
+
+                var options = new JsonSerializerOptions{
+                    PropertyNameCaseInsensitive = true
+                };
+
+                UserData? data = JsonSerializer.Deserialize<UserData?>(responseBody, options);
+                return data;
+            }
+            catch (HttpRequestException e)
+            {
+                Console.WriteLine($"Request error: {e.Message}");
+            }
+            catch (JsonException e)
+            {
+                Console.WriteLine($"JSON parse error: {e.Message}");
+            }
+            return null;
+        }
+
+
+        public static async Task<bool> AddCompletedEpisode(string? username, string? password, string? series_name, Episode? episode){
+
+            if (username == null ||
+                password == null ||
+                series_name == null ||
+                episode == null) return false;
+
+
+            string serialized_episode = JsonSerializer.Serialize(episode);
+
+            string url = Server.Domain + Server.Users + Server.Data + Server.AddCompletedEpisode +
+                         $"?username={username}" +
+                         $"&password={password}" +
+                         $"&series={series_name}" +
+                         $"&episode={serialized_episode}";
+
+            try
+            {
+                HttpResponseMessage response = await client.GetAsync(url);
+                response.EnsureSuccessStatusCode();
+
+                string content = await response.Content.ReadAsStringAsync();
+
+                // Try to parse it as a JSON bool
+                if (bool.TryParse(content, out bool result)){
+                    return result;
+                }
+
+                if (content.Trim() == "\"true\"")
+                    return true;
+
+
+                if (content.Trim() == "\"false\"")
+                    return false;
+            }
+            catch (HttpRequestException e)
+            {
+                Console.WriteLine($"Request error: {e.Message}");
+            }
+            catch (JsonException e)
+            {
+                Console.WriteLine($"JSON parse error: {e.Message}");
+            }
+            return false;
+        }
+
+
+        public static async Task<bool> RemoveCompletedEpisode(string? username, string? password, string? series_name, Episode? episode)
+        {
+
+            if (username == null ||
+                password == null ||
+                series_name == null ||
+                episode == null) return false;
+
+
+            string serialized_episode = JsonSerializer.Serialize(episode);
+
+            string url = Server.Domain + Server.Users + Server.Data + Server.RemoveCompletedEpisode +
+                         $"?username={username}" +
+                         $"&password={password}" +
+                         $"&series={series_name}" +
+                         $"&episode={serialized_episode}";
+
+            Console.WriteLine(url);
+
+            try
+            {
+                HttpResponseMessage response = await client.GetAsync(url);
+                response.EnsureSuccessStatusCode();
+
+                string content = await response.Content.ReadAsStringAsync();
+
+                // Try to parse it as a JSON bool
+                if (bool.TryParse(content, out bool result))
+                {
+                    return result;
+                }
+
+                if (content.Trim() == "\"true\"")
+                    return true;
+
+
+                if (content.Trim() == "\"false\"")
+                    return false;
+            }
+            catch (HttpRequestException e)
+            {
+                Console.WriteLine($"Request error: {e.Message}");
+            }
+            catch (JsonException e)
+            {
+                Console.WriteLine($"JSON parse error: {e.Message}");
+            }
+            return false;
+        }
+
+
+
+
+
+        public static async Task<bool> AddBookmarkEpisode(string? username, string? password, string? series_name, Episode? episode)
+        {
+
+            if (username == null ||
+                password == null ||
+                series_name == null ||
+                episode == null) return false;
+
+
+            string serialized_episode = JsonSerializer.Serialize(episode);
+
+            string url = Server.Domain + Server.Users + Server.Data + Server.AddBookmarkedEpisode +
+                         $"?username={username}" +
+                         $"&password={password}" +
+                         $"&series={series_name}" +
+                         $"&episode={serialized_episode}";
+
+            try
+            {
+                HttpResponseMessage response = await client.GetAsync(url);
+                response.EnsureSuccessStatusCode();
+
+                string content = await response.Content.ReadAsStringAsync();
+
+                // Try to parse it as a JSON bool
+                if (bool.TryParse(content, out bool result))
+                {
+                    return result;
+                }
+
+                if (content.Trim() == "\"true\"")
+                    return true;
+
+
+                if (content.Trim() == "\"false\"")
+                    return false;
+            }
+            catch (HttpRequestException e)
+            {
+                Console.WriteLine($"Request error: {e.Message}");
+            }
+            catch (JsonException e)
+            {
+                Console.WriteLine($"JSON parse error: {e.Message}");
+            }
+            return false;
+        }
+
+
+        public static async Task<bool> RemoveBookmarkEpisode(string? username, string? password, string? series_name, Episode? episode)
+        {
+
+            if (username == null ||
+                password == null ||
+                series_name == null ||
+                episode == null) return false;
+
+
+            string serialized_episode = JsonSerializer.Serialize(episode);
+
+            string url = Server.Domain + Server.Users + Server.Data + Server.RemoveBookmarkedEpisode +
+                         $"?username={username}" +
+                         $"&password={password}" +
+                         $"&series={series_name}" +
+                         $"&episode={serialized_episode}";
+
+            try
+            {
+                HttpResponseMessage response = await client.GetAsync(url);
+                response.EnsureSuccessStatusCode();
+
+                string content = await response.Content.ReadAsStringAsync();
+
+                // Try to parse it as a JSON bool
+                if (bool.TryParse(content, out bool result))
+                {
+                    return result;
+                }
+
+                if (content.Trim() == "\"true\"")
+                    return true;
+
+
+                if (content.Trim() == "\"false\"")
+                    return false;
+            }
+            catch (HttpRequestException e)
+            {
+                Console.WriteLine($"Request error: {e.Message}");
+            }
+            catch (JsonException e)
+            {
+                Console.WriteLine($"JSON parse error: {e.Message}");
+            }
+            return false;
+        }
 
     }
 }

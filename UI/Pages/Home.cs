@@ -33,10 +33,13 @@ namespace AnimeRaider.UI.Pages
 
         }
 
+
+        bool isLoaded = false;
         private async void Update(){
+            if (isLoaded) return;
 
+            isLoaded = true;
             RemoveAllPosters();
-
             SharedData.Data.RandomSeries = await Network.Requester.GetRandomSeries(12);
             if (SharedData.Data.RandomSeries != null){
 

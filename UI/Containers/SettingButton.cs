@@ -16,7 +16,7 @@ namespace AnimeRaider.UI.Containers
 
         private Animations.Transations.Uniform? HoverTranstion;
         private Animations.Transations.EaseOut? ShowHideTransation;
-        private Animations.Transations.Uniform? RotationAnimation;  
+        private Animations.Transations.Uniform? RotationAnimation;
 
 
         private Action? _Trigger;

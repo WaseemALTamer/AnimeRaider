@@ -1,16 +1,19 @@
-﻿using AnimeRaider.Structures;
+﻿using System.Text.RegularExpressions;
+using AnimeRaider.Structures;
 using System.Threading.Tasks;
 using Avalonia.Media.Imaging;
 using AnimeRaider.Setting;
+using System.Diagnostics;
 using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Input;
 using System.IO;
 using SkiaSharp;
 using Avalonia;
-using System.Text.RegularExpressions;
 using System;
-using System.Diagnostics;
+using Avalonia.Interactivity;
+
+
 
 
 
@@ -40,6 +43,12 @@ namespace AnimeRaider.UI.Containers
 
         private TextBlock? EpisodeNumber;
         private TextBlock? EpisodeDuration;
+
+        private Common.Status? EpisodeStatus;
+
+        private ContextMenu? RightClickMenu;
+        private MenuItem MenuItemComplete = new MenuItem { Header = "Complete"};
+        private MenuItem MenuItemBookmarked = new MenuItem { Header = "Bookmark"};
 
 
         private Canvas? _MainCanvas;
@@ -78,6 +87,8 @@ namespace AnimeRaider.UI.Containers
             get { return _CoverBitmap; }
             set { _CoverBitmap = value; }
         }
+
+
 
 
         public Thumbnail(Canvas? master, Episode? episode){
@@ -166,8 +177,7 @@ namespace AnimeRaider.UI.Containers
             MainCanvas.Children.Add(EpisodeNumber);
 
 
-            EpisodeDuration = new TextBlock
-            {
+            EpisodeDuration = new TextBlock{
                 Text = "None",
                 Height = 25,
                 Width = 300,
@@ -175,6 +185,20 @@ namespace AnimeRaider.UI.Containers
             };
             MainCanvas.Children.Add(EpisodeDuration);
 
+            EpisodeStatus = new Common.Status();
+            MainCanvas.Children.Add(EpisodeStatus);
+
+
+
+            RightClickMenu = new ContextMenu {
+                ItemsSource = new[] {
+                    MenuItemComplete,
+                    MenuItemBookmarked,
+                }
+            };
+
+
+            ContextMenu = RightClickMenu;
 
 
             if (Master != null){
@@ -190,6 +214,7 @@ namespace AnimeRaider.UI.Containers
         bool _loaded = false;
         private async void OnLoaded(object? sender = null, object? e = null)
         {
+            if (SharedData.TargetedData.Series == null) return;
 
             if (_loaded){
                 return;
@@ -205,12 +230,19 @@ namespace AnimeRaider.UI.Containers
                 EpisodeNumber.Text = ExtractLastNumberString(Episode.Name);
             }
 
-            if (EpisodeDuration != null)
-            {
+            if (EpisodeDuration != null){
                 EpisodeDuration.Text = SecondsToHMS(Episode.Duration);
             }
 
 
+
+            SetStatus();
+
+
+
+
+
+            // this is responsible for the thumbnail image
             int targetWidth = (int)(Width * 1.4);  // capture UI property on UI thread
             // Run the image download and resizing off the UI thread
             MemoryStream? imageStream = await Task.Run(async () => {
@@ -273,6 +305,11 @@ namespace AnimeRaider.UI.Containers
                     if (EpisodeDuration != null){
                         Canvas.SetLeft(EpisodeDuration, 10);
                         Canvas.SetTop(EpisodeDuration, MainCanvas.Height - EpisodeDuration.Height - 15);
+                    }
+
+                    if (EpisodeStatus != null) {
+                        Canvas.SetLeft(EpisodeStatus, MainCanvas.Width - EpisodeStatus.Width - 25);
+                        Canvas.SetTop(EpisodeStatus,25);
                     }
 
                 }
@@ -433,8 +470,7 @@ namespace AnimeRaider.UI.Containers
             PostionTranslation.TranslateForward();
         }
 
-        private void SetPostionTrigger(double value)
-        {
+        private void SetPostionTrigger(double value){
             Canvas.SetLeft(this, InitialPos.X + (FinalPos.X - InitialPos.X) * value);
             Canvas.SetTop(this, InitialPos.Y + (FinalPos.Y - InitialPos.Y) * value);
         }
@@ -466,6 +502,9 @@ namespace AnimeRaider.UI.Containers
                         return;
                     }
 
+
+
+
                     var series = Uri.EscapeDataString(SharedData.TargetedData.Series.Name);
                     var episode = Uri.EscapeDataString(SharedData.TargetedData.Episode.Name);
 
@@ -480,12 +519,141 @@ namespace AnimeRaider.UI.Containers
                         Process.Start(psi);
                     }
                     catch (Exception ex){
-                        Console.WriteLine("Failed to launch VLC: " + ex.Message);
+                        Console.WriteLine("Failed to launch: " + ex.Message);
                     }
+
+
+                    SetComplete();
 
                 }
             }
         }
+
+        public async void SetComplete(object? sender=null, object? e=null) {
+            if (SharedData.TargetedData.Series == null) return;
+            bool results = await Network.Requester.AddCompletedEpisode(SharedData.Data.Username,
+                                                               SharedData.Data.Password,
+                                                               SharedData.TargetedData.Series.Name,
+                                                               Episode);
+
+            if (results)
+            {
+                // now we can add it locally
+                SharedData.Data.SetEpisodeComplete(SharedData.TargetedData.Series.Name,
+                                                   Episode);
+
+                SetStatus();
+
+            }
+
+        }
+
+        public async void RemoveComplete(object? sender = null, object? e = null)
+        {
+            if (SharedData.TargetedData.Series == null) return;
+            bool results = await Network.Requester.RemoveCompletedEpisode(SharedData.Data.Username,
+                                                               SharedData.Data.Password,
+                                                               SharedData.TargetedData.Series.Name,
+                                                               Episode);
+
+            if (results)
+            {
+                // now we can add it locally
+                SharedData.Data.RemoveEpisodeComplete(SharedData.TargetedData.Series.Name,
+                                                   Episode);
+
+                SetStatus();
+
+            }
+
+        }
+
+        public async void SetBookmark(object? sender = null, object? e = null){
+            if (SharedData.TargetedData.Series == null) return;
+
+            bool results = await Network.Requester.AddBookmarkEpisode(SharedData.Data.Username,
+                                                       SharedData.Data.Password,
+                                                       SharedData.TargetedData.Series.Name,
+                                                       Episode);
+
+            if (results)
+            {
+                // now we can add it locally
+                SharedData.Data.SetEpisodeBookmarked(SharedData.TargetedData.Series.Name,
+                                                   Episode);
+
+                SetStatus();
+
+            }
+
+        }
+
+        public async void RemoveBookmark(object? sender = null, object? e = null){
+            if (SharedData.TargetedData.Series == null) return;
+
+            bool results = await Network.Requester.RemoveBookmarkEpisode(SharedData.Data.Username,
+                                                       SharedData.Data.Password,
+                                                       SharedData.TargetedData.Series.Name,
+                                                       Episode);
+
+            if (results)
+            {
+                // now we can add it locally
+                SharedData.Data.RemoveEpisodeBookmarked(SharedData.TargetedData.Series.Name,
+                                                   Episode);
+
+                SetStatus();
+
+            }
+
+        }
+
+
+        public void SetStatus() {
+            if (SharedData.TargetedData.Series == null ||
+                SharedData.TargetedData.Series.Name == null || 
+                Episode == null) return;
+
+            if (EpisodeStatus != null)
+                EpisodeStatus.Reset();
+
+            if (SharedData.Data.IsEpisodeInCompleted(
+            SharedData.TargetedData.Series.Name,
+            Episode.Name))
+            {
+                if (EpisodeStatus != null)
+                    EpisodeStatus.SetColor(Themes.Complete);
+
+                MenuItemComplete.Header = "UnComplete";
+                MenuItemComplete.Click += RemoveComplete;
+                MenuItemComplete.Click -= SetComplete;
+            }
+            else {
+                MenuItemComplete.Header = "Complete";
+                MenuItemComplete.Click += SetComplete;
+                MenuItemComplete.Click -= RemoveComplete;
+
+            }
+
+            if (SharedData.Data.IsEpisodeBookmarked(
+                    SharedData.TargetedData.Series.Name,
+                    Episode.Name
+                ))
+            {
+                if (EpisodeStatus != null)
+                    EpisodeStatus.SetColor(Themes.Bookmarked);
+
+                MenuItemBookmarked.Header = "UnBookmark";
+                MenuItemBookmarked.Click += RemoveBookmark;
+                MenuItemBookmarked.Click -= SetBookmark;
+            }
+            else {
+                MenuItemBookmarked.Header = "Bookmark";
+                MenuItemBookmarked.Click += SetBookmark;
+                MenuItemBookmarked.Click -= RemoveBookmark;
+            }
+        }
+
 
 
 
@@ -580,6 +748,10 @@ namespace AnimeRaider.UI.Containers
             else
                 return $"{minutes}:{seconds:D2}";
         }
+
+
+
+
 
 
         public static MemoryStream SKImageToDarkenBitmap(SKBitmap original){

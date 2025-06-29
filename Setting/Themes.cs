@@ -30,5 +30,9 @@ namespace AnimeRaider.Setting{
         public static SolidColorBrush Text = new SolidColorBrush(Color.FromUInt32(0xffffffff));
         public static SolidColorBrush Timer = new SolidColorBrush(Color.FromUInt32(0xffffffff));
 
+
+        public static SolidColorBrush Complete = new SolidColorBrush(Color.FromUInt32(0xff0000ff));
+        public static SolidColorBrush Bookmarked = new SolidColorBrush(Color.FromUInt32(0xff00ff00));
+
     }
 }

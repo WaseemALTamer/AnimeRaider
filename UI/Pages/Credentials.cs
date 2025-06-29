@@ -31,7 +31,8 @@ namespace AnimeRaider.UI.Pages
             if (MainCanvas != null) {
                 if (Connector != null) {
                     Canvas.SetLeft(Connector, (MainCanvas.Width - Connector.Width) /2);
-                    Canvas.SetTop(Connector, (MainCanvas.Height - Connector.Height) / 2);
+                    Canvas.SetTop(Connector, 30);
+                    MainCanvas.Height = Connector.Height + 60;
                 }
             
             }
