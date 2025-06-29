@@ -1,16 +1,15 @@
-﻿using AnimeRaider.Structures;
-using Avalonia.Media.Imaging;
-using SkiaSharp;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Runtime.CompilerServices;
-using System.Text;
+﻿using System.Collections.Generic;
+using AnimeRaider.Structures;
+using System.Threading.Tasks;
 using System.Text.Json;
 using System.Threading;
-using System.Threading.Tasks;
-using System.Xml.Serialization;
+using System.Net.Http;
+using SkiaSharp;
+using System;
+
+
+
+
 
 namespace AnimeRaider.Network
 {

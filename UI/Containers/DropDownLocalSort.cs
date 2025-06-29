@@ -19,6 +19,8 @@ namespace AnimeRaider.UI.Containers
         private ComboBoxItem PlanToWatchItem = new ComboBoxItem { Content = "PlanToWatch", FontSize = 18 };
         private ComboBoxItem BookmarkedItem = new ComboBoxItem { Content = "Bookmarked", FontSize = 18 };
         private ComboBoxItem WatchAgainItem = new ComboBoxItem { Content = "WatchAgain", FontSize = 18 };
+        private ComboBoxItem AllItem = new ComboBoxItem { Content = "All", FontSize = 18 };
+
 
         public DropDownLocalSort(Canvas master) {
             Master = master;
@@ -28,8 +30,7 @@ namespace AnimeRaider.UI.Containers
 
             CornerRadius = new CornerRadius(Config.CornerRadius);
 
-            MainMenu = new ComboBox
-            {
+            MainMenu = new ComboBox{
                 Width = 250,
                 Height = 40,
                 PlaceholderText = "User Category",
@@ -40,7 +41,8 @@ namespace AnimeRaider.UI.Containers
                     WatchingItem, 
                     PlanToWatchItem,
                     BookmarkedItem,
-                    WatchAgainItem 
+                    WatchAgainItem,
+                    AllItem
                 },
                 CornerRadius = new CornerRadius(Config.CornerRadius),
                 FontSize = 18
@@ -126,6 +128,9 @@ namespace AnimeRaider.UI.Containers
                     case var _ when selectedItem == WatchAgainItem:
                         SetWatchAgain();
                         break;
+                    case var _ when selectedItem == AllItem:
+                        SetAll();
+                        break;
                 }
             }
         }
@@ -200,8 +205,19 @@ namespace AnimeRaider.UI.Containers
                 if (PublicWidgets.DisplayedPage != PublicWidgets.UISorter)
                     PublicWidgets.TransitionForward(PublicWidgets.UISorter);
             }
+        }
 
+        private async void SetAll(){
+            SharedData.Data.AllSeries = await Network.Requester.GetAllSeries();
+            if (SharedData.Data.AllSeries != null){
 
+                if (PublicWidgets.UISorter != null){
+                    PublicWidgets.UISorter.Update(SharedData.Data.AllSeries);
+                    if (PublicWidgets.DisplayedPage != PublicWidgets.UISorter)
+                        PublicWidgets.TransitionForward(PublicWidgets.UISorter);
+                }
+
+            }
         }
 
 
