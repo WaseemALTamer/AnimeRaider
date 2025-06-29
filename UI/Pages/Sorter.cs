@@ -9,7 +9,12 @@ using System;
 
 namespace AnimeRaider.UI.Pages
 {
-    public class Home : Base{
+    public class Sorter : Base
+    {
+        // this sort page will be called in order for you to provide the list and  it will display them
+        // this will only display the sorted data that you privode it it could display everything or it
+        // could only display what you want it is upto you
+
 
         public List<Poster> Posters = new List<Poster>();
 
@@ -18,13 +23,13 @@ namespace AnimeRaider.UI.Pages
         public double PadX = 20;
 
 
-        public Home(Canvas? master) : base(master){
+        public Sorter(Canvas? master) : base(master)
+        {
             if (MainCanvas == null) return;
 
-            OnShow += Update;
 
-
-            if (Master != null) {
+            if (Master != null)
+            {
                 Master.SizeChanged += OnSizeChanged;
             }
 
@@ -34,20 +39,20 @@ namespace AnimeRaider.UI.Pages
         }
 
 
-        bool isLoaded = false;
-        private async void Update(){
-            if (isLoaded) return;
-
-            isLoaded = true;
+        public async void Update(List<Structures.Series> SeriesList){
             RemoveAllPosters();
-            SharedData.Data.RandomSeries = await Network.Requester.GetRandomSeries(12);
-            if (SharedData.Data.RandomSeries != null){
 
-                for (int i = 0; i < SharedData.Data.RandomSeries.Count ; i++) {
-                    Poster poster = new Poster(MainCanvas, SharedData.Data.RandomSeries[i]);
+
+
+
+            if (SeriesList != null){
+
+                for (int i = 0; i < SeriesList.Count; i++){
+                    Poster poster = new Poster(MainCanvas, SeriesList[i]);
                     Posters.Add(poster);
 
-                    if (MainCanvas != null){
+                    if (MainCanvas != null)
+                    {
                         MainCanvas.Children.Add(poster);
                     }
 
@@ -60,10 +65,12 @@ namespace AnimeRaider.UI.Pages
         }
 
 
-        public void RemoveAllPosters(){
+        public void RemoveAllPosters()
+        {
             if (MainCanvas == null) return;
 
-            for (int i = 0; i < Posters.Count; i++){
+            for (int i = 0; i < Posters.Count; i++)
+            {
                 var poster = Posters[i];
                 poster.Kill();
             }
@@ -73,30 +80,36 @@ namespace AnimeRaider.UI.Pages
         }
 
 
-        private void OnSizeChanged(object? sender = null, object? e = null) {
+        private void OnSizeChanged(object? sender = null, object? e = null)
+        {
             SetPosterPos();
         }
 
-        private void OnPropertyChanged(object? sender = null, object? e = null) {
+        private void OnPropertyChanged(object? sender = null, object? e = null)
+        {
             ShowPostersVisaibleOnly();
         }
 
 
-        private void SetPosterPos() {
+        private void SetPosterPos()
+        {
 
             if (MainCanvas == null) return;
 
             MainCanvas.Height = 0;
-            for (int i = 0; i < Posters.Count ; i++){
-                
+            for (int i = 0; i < Posters.Count; i++)
+            {
+
                 var poster = Posters[i];
-                if (poster != null){
+                if (poster != null)
+                {
                     double _SpacePerCover = MainCanvas.Width / (poster.Width + PadX);
                     double _ColumnsNum = Math.Floor(_SpacePerCover);
                     double _LeftSpace = (_SpacePerCover - _ColumnsNum) * (poster.Width + PadX);
                     double _RowNum = Math.Floor(i / _ColumnsNum);
 
-                    if (_ColumnsNum == 0){
+                    if (_ColumnsNum == 0)
+                    {
                         _RowNum = i;
                     }
 
@@ -116,7 +129,8 @@ namespace AnimeRaider.UI.Pages
             ShowPostersVisaibleOnly();
         }
 
-        private void ShowPostersVisaibleOnly() {
+        private void ShowPostersVisaibleOnly()
+        {
 
             if (ScrollViewer == null || MainCanvas == null) return;
 
@@ -124,7 +138,8 @@ namespace AnimeRaider.UI.Pages
 
             if (Posters == null) return;
 
-            for (int i = 0; i < Posters.Count; i++){
+            for (int i = 0; i < Posters.Count; i++)
+            {
 
                 var Cover = Posters[i];
                 if (Cover == null) continue;
@@ -142,11 +157,13 @@ namespace AnimeRaider.UI.Pages
 
 
 
-                if (_PosY >= _LowerBounds && _PosY <= _UpperBounds){
+                if (_PosY >= _LowerBounds && _PosY <= _UpperBounds)
+                {
                     Posters[i].IsVisible = true;
                     Cover.Show();
                 }
-                else{
+                else
+                {
                     Posters[i].IsVisible = false;
                 }
             }

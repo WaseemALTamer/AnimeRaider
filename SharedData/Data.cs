@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using AnimeRaider.Setting;
 using AnimeRaider.Structures;
 
@@ -73,7 +74,16 @@ namespace AnimeRaider.SharedData
             return false;
         }
 
-        
+
+        public static bool IsSeriesInList(Series? series, List<Series>? list){
+            if (series == null || list == null)
+                return false;
+
+            return list.Any(s => s?.Name == series.Name);
+        }
+
+
+
         public static bool SetEpisodeComplete(string? series_name, Episode? episode) {
             // this function will intract with the data locally only
 
@@ -102,6 +112,7 @@ namespace AnimeRaider.SharedData
 
             return true;
         }
+
 
 
         public static bool SetEpisodeBookmarked(string? series_name, Episode? episode){
@@ -172,6 +183,31 @@ namespace AnimeRaider.SharedData
             ) > 0;
 
             return removed;
+        }
+
+
+        public static bool AddSeriesToList(Series? series, List<Series>? targetList){
+            if (series == null || string.IsNullOrWhiteSpace(series.Name)) return false;
+
+            if (targetList == null) return false;
+
+            bool alreadyExists = targetList.Any(s => s?.Name == series.Name);
+            if (!alreadyExists){
+                targetList.Add(series);
+                return true;
+            }
+
+            return false;
+        }
+
+
+        public static bool RemoveSeriesFromList(Series? series, List<Series>? targetList){
+            if (series == null || string.IsNullOrWhiteSpace(series.Name)) return false;
+
+            if (targetList == null) return false;
+            int removedCount = targetList.RemoveAll(s => s?.Name == series.Name);
+
+            return removedCount > 0;
         }
 
 

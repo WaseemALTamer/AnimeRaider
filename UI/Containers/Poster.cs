@@ -6,8 +6,9 @@ using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Input;
 using SkiaSharp;
-using Avalonia;
 using System.IO;
+using Avalonia;
+
 
 
 
@@ -32,10 +33,19 @@ namespace AnimeRaider.UI.Containers
         private Animations.Transations.Uniform? ShowHideTransition;
 
 
+        private ContextMenu? RightClickMenu;
+
+        private MenuItem CompletedItem = new MenuItem { Header = "Completed"};
+        private MenuItem WatchingItem = new MenuItem { Header = "Watching" };
+        private MenuItem PlanToWatchItem = new MenuItem { Header = "PlanToWatch"};
+        private MenuItem BookmarkedItem = new MenuItem { Header = "Bookmarked"};
+        private MenuItem WatchAgainItem = new MenuItem { Header = "WatchAgain"};
 
 
 
-        private Canvas? _MainCanvas;
+
+
+private Canvas? _MainCanvas;
 
         public Canvas? MainCanvas
         {
@@ -110,6 +120,22 @@ namespace AnimeRaider.UI.Containers
             //Loaded += OnLoaded; // instead  of loading  the  content when we create
                                   // the poseter we load the content when we show the
                                   // content 
+
+
+
+            RightClickMenu = new ContextMenu {
+                ItemsSource = new[] {
+                    CompletedItem,
+                    WatchingItem,
+                    PlanToWatchItem,
+                    BookmarkedItem,
+                    WatchAgainItem
+                    }
+            };
+
+            SetStatus();
+
+            ContextMenu = RightClickMenu;
 
 
             if (Master != null){
@@ -204,6 +230,290 @@ namespace AnimeRaider.UI.Containers
                 IsKill = true;
             }
         }
+
+
+
+
+        // COMPLETEED
+        public async void SetCompleted(object? sender = null, object? e = null){
+            if (Series == null || SharedData.Data.UserData == null) return;
+
+            bool results = await Network.Requester.AddSeriesToCategory(SharedData.Data.Username,
+                                                               SharedData.Data.Password,
+                                                               Network.Server.Completed,
+                                                               Series);
+
+            if (results){
+                // now we can add it locally
+                SharedData.Data.AddSeriesToList(Series, SharedData.Data.UserData.Completed);
+                SetStatus();
+
+            }
+
+        }
+
+        public async void RemoveCompleted(object? sender = null, object? e = null)
+        {
+            if (Series == null || SharedData.Data.UserData == null) return;
+
+            bool results = await Network.Requester.RemoveSeriesToCategory(SharedData.Data.Username,
+                                                               SharedData.Data.Password,
+                                                               Network.Server.Completed,
+                                                               Series);
+
+            if (results){
+                // now we can add it locally
+                SharedData.Data.RemoveSeriesFromList(Series, SharedData.Data.UserData.Completed);
+                SetStatus();
+            }
+
+        }
+
+        // WATCHING
+        public async void SetWatching(object? sender = null, object? e = null)
+        {
+            if (Series == null || SharedData.Data.UserData == null) return;
+
+            bool results = await Network.Requester.AddSeriesToCategory(
+                SharedData.Data.Username,
+                SharedData.Data.Password,
+                Network.Server.Watching,
+                Series);
+
+            if (results)
+            {
+                SharedData.Data.AddSeriesToList(Series, SharedData.Data.UserData.Watching);
+                SetStatus();
+            }
+        }
+
+        public async void RemoveWatching(object? sender = null, object? e = null)
+        {
+            if (Series == null || SharedData.Data.UserData == null) return;
+
+            bool results = await Network.Requester.RemoveSeriesToCategory(
+                SharedData.Data.Username,
+                SharedData.Data.Password,
+                Network.Server.Watching,
+                Series);
+
+            if (results)
+            {
+                SharedData.Data.RemoveSeriesFromList(Series, SharedData.Data.UserData.Watching);
+                SetStatus();
+            }
+        }
+
+        // PLAN TO WATCH
+        public async void SetPlanToWatch(object? sender = null, object? e = null)
+        {
+            if (Series == null || SharedData.Data.UserData == null) return;
+
+            bool results = await Network.Requester.AddSeriesToCategory(
+                SharedData.Data.Username,
+                SharedData.Data.Password,
+                Network.Server.PlanToWatch,
+                Series);
+
+            if (results)
+            {
+                SharedData.Data.AddSeriesToList(Series, SharedData.Data.UserData.PlanToWatch);
+                SetStatus();
+            }
+        }
+
+        public async void RemovePlanToWatch(object? sender = null, object? e = null)
+        {
+            if (Series == null || SharedData.Data.UserData == null) return;
+
+            bool results = await Network.Requester.RemoveSeriesToCategory(
+                SharedData.Data.Username,
+                SharedData.Data.Password,
+                Network.Server.PlanToWatch,
+                Series);
+
+            if (results)
+            {
+                SharedData.Data.RemoveSeriesFromList(Series, SharedData.Data.UserData.PlanToWatch);
+                SetStatus();
+            }
+        }
+
+        // BOOKMARKED
+        public async void SetBookmarked(object? sender = null, object? e = null)
+        {
+            if (Series == null || SharedData.Data.UserData == null) return;
+
+            bool results = await Network.Requester.AddSeriesToCategory(
+                SharedData.Data.Username,
+                SharedData.Data.Password,
+                Network.Server.Bookmarked,
+                Series);
+
+            if (results)
+            {
+                SharedData.Data.AddSeriesToList(Series, SharedData.Data.UserData.Bookmarked);
+                SetStatus();
+            }
+        }
+
+        public async void RemoveBookmarked(object? sender = null, object? e = null)
+        {
+            if (Series == null || SharedData.Data.UserData == null) return;
+
+            bool results = await Network.Requester.RemoveSeriesToCategory(
+                SharedData.Data.Username,
+                SharedData.Data.Password,
+                Network.Server.Bookmarked,
+                Series);
+
+            if (results)
+            {
+                SharedData.Data.RemoveSeriesFromList(Series, SharedData.Data.UserData.Bookmarked);
+                SetStatus();
+            }
+        }
+
+        // WATCH AGAIN
+        public async void SetWatchAgain(object? sender = null, object? e = null)
+        {
+            if (Series == null || SharedData.Data.UserData == null) return;
+
+            bool results = await Network.Requester.AddSeriesToCategory(
+                SharedData.Data.Username,
+                SharedData.Data.Password,
+                Network.Server.WatchAgain,
+                Series);
+
+            if (results)
+            {
+                SharedData.Data.AddSeriesToList(Series, SharedData.Data.UserData.WatchAgain);
+                SetStatus();
+            }
+        }
+
+        public async void RemoveWatchAgain(object? sender = null, object? e = null)
+        {
+            if (Series == null || SharedData.Data.UserData == null) return;
+
+            bool results = await Network.Requester.RemoveSeriesToCategory(
+                SharedData.Data.Username,
+                SharedData.Data.Password,
+                Network.Server.WatchAgain,
+                Series);
+
+            if (results)
+            {
+                SharedData.Data.RemoveSeriesFromList(Series, SharedData.Data.UserData.WatchAgain);
+                SetStatus();
+            }
+        }
+
+
+
+
+
+
+        public void SetStatus()
+        {
+            if (Series == null || SharedData.Data.UserData == null) return;
+
+            // Completed
+            if (SharedData.Data.IsSeriesInList(Series, SharedData.Data.UserData.Completed))
+            {
+                CompletedItem.Header = "UnCompleted";
+                CompletedItem.Click -= RemoveCompleted;
+                CompletedItem.Click += RemoveCompleted;
+                CompletedItem.Click -= SetCompleted;
+            }
+            else
+            {
+                CompletedItem.Header = "Completed";
+                CompletedItem.Click -= SetCompleted;
+                CompletedItem.Click += SetCompleted;
+                CompletedItem.Click -= RemoveCompleted;
+            }
+
+            // Watching
+            if (SharedData.Data.IsSeriesInList(Series, SharedData.Data.UserData.Watching))
+            {
+                WatchingItem.Header = "UnWatching";
+                WatchingItem.Click -= RemoveWatching;
+                WatchingItem.Click += RemoveWatching;
+                WatchingItem.Click -= SetWatching;
+            }
+            else
+            {
+                WatchingItem.Header = "Watching";
+                WatchingItem.Click -= SetWatching;
+                WatchingItem.Click += SetWatching;
+                WatchingItem.Click -= RemoveWatching;
+            }
+
+            // PlanToWatch
+            if (SharedData.Data.IsSeriesInList(Series, SharedData.Data.UserData.PlanToWatch))
+            {
+                PlanToWatchItem.Header = "UnPlanToWatch";
+                PlanToWatchItem.Click -= RemovePlanToWatch;
+                PlanToWatchItem.Click += RemovePlanToWatch;
+                PlanToWatchItem.Click -= SetPlanToWatch;
+            }
+            else
+            {
+                PlanToWatchItem.Header = "PlanToWatch";
+                PlanToWatchItem.Click -= SetPlanToWatch;
+                PlanToWatchItem.Click += SetPlanToWatch;
+                PlanToWatchItem.Click -= RemovePlanToWatch;
+            }
+
+            // Bookmarked
+            if (SharedData.Data.IsSeriesInList(Series, SharedData.Data.UserData.Bookmarked))
+            {
+                BookmarkedItem.Header = "UnBookmarked";
+                BookmarkedItem.Click -= RemoveBookmarked;
+                BookmarkedItem.Click += RemoveBookmarked;
+                BookmarkedItem.Click -= SetBookmarked;
+            }
+            else
+            {
+                BookmarkedItem.Header = "Bookmarked";
+                BookmarkedItem.Click -= SetBookmarked;
+                BookmarkedItem.Click += SetBookmarked;
+                BookmarkedItem.Click -= RemoveBookmarked;
+            }
+
+            // WatchAgain
+            if (SharedData.Data.IsSeriesInList(Series, SharedData.Data.UserData.WatchAgain))
+            {
+                WatchAgainItem.Header = "UnWatchAgain";
+                WatchAgainItem.Click -= RemoveWatchAgain;
+                WatchAgainItem.Click += RemoveWatchAgain;
+                WatchAgainItem.Click -= SetWatchAgain;
+            }
+            else
+            {
+                WatchAgainItem.Header = "WatchAgain";
+                WatchAgainItem.Click -= SetWatchAgain;
+                WatchAgainItem.Click += SetWatchAgain;
+                WatchAgainItem.Click -= RemoveWatchAgain;
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         public void Dispose(){
 

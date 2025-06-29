@@ -230,7 +230,6 @@ namespace AnimeRaider.Network
                          $"&series={series_name}" +
                          $"&episode={serialized_episode}";
 
-            Console.WriteLine(url);
 
             try
             {
@@ -332,6 +331,108 @@ namespace AnimeRaider.Network
                          $"&password={password}" +
                          $"&series={series_name}" +
                          $"&episode={serialized_episode}";
+
+            try
+            {
+                HttpResponseMessage response = await client.GetAsync(url);
+                response.EnsureSuccessStatusCode();
+
+                string content = await response.Content.ReadAsStringAsync();
+
+                // Try to parse it as a JSON bool
+                if (bool.TryParse(content, out bool result))
+                {
+                    return result;
+                }
+
+                if (content.Trim() == "\"true\"")
+                    return true;
+
+
+                if (content.Trim() == "\"false\"")
+                    return false;
+            }
+            catch (HttpRequestException e)
+            {
+                Console.WriteLine($"Request error: {e.Message}");
+            }
+            catch (JsonException e)
+            {
+                Console.WriteLine($"JSON parse error: {e.Message}");
+            }
+            return false;
+        }
+
+
+
+        public static async Task<bool> AddSeriesToCategory(string? username, string? password,string? category, Series? series)
+        {
+
+            // for category check the server.cs for the constants and pick the catogroy such as [complete, plantowatch, watching, ...]
+
+            if (username == null ||
+                password == null ||
+                series == null) return false;
+
+
+            string serialized_series = JsonSerializer.Serialize(series);
+
+            string url = Server.Domain + Server.Users + Server.Data + Server.AddSeries +
+                         $"?username={username}" +
+                         $"&password={password}" +
+                         $"&category={category}" +
+                         $"&series={serialized_series}";
+
+            try
+            {
+                HttpResponseMessage response = await client.GetAsync(url);
+                response.EnsureSuccessStatusCode();
+
+                string content = await response.Content.ReadAsStringAsync();
+
+                // Try to parse it as a JSON bool
+                if (bool.TryParse(content, out bool result))
+                {
+                    return result;
+                }
+
+                if (content.Trim() == "\"true\"")
+                    return true;
+
+
+                if (content.Trim() == "\"false\"")
+                    return false;
+            }
+            catch (HttpRequestException e)
+            {
+                Console.WriteLine($"Request error: {e.Message}");
+            }
+            catch (JsonException e)
+            {
+                Console.WriteLine($"JSON parse error: {e.Message}");
+            }
+            return false;
+        }
+
+
+
+        public static async Task<bool> RemoveSeriesToCategory(string? username, string? password, string? category, Series? series)
+        {
+
+            // for category check the server.cs for the constants and pick the catogroy such as [complete, plantowatch, watching, ...]
+
+            if (username == null ||
+                password == null ||
+                series == null) return false;
+
+
+            string serialized_series = JsonSerializer.Serialize(series);
+
+            string url = Server.Domain + Server.Users + Server.Data + Server.RemoveSeries +
+                         $"?username={username}" +
+                         $"&password={password}" +
+                         $"&category={category}" +
+                         $"&series={serialized_series}";
 
             try
             {

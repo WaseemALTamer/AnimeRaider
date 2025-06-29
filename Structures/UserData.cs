@@ -13,7 +13,7 @@ namespace AnimeRaider.Structures{
 
 
         [JsonPropertyName("PlanToWatch")]
-        public List<Series>? PlanToWatchver { get; set; }
+        public List<Series>? PlanToWatch { get; set; }
 
 
         [JsonPropertyName("Watching")]

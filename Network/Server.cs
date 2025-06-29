@@ -37,5 +37,14 @@ namespace AnimeRaider.Network
         public const string RemoveBookmarkedEpisode = "remove_bookmarked_episode";
 
 
+
+        // Catogries
+        public const string Completed = "Completed";
+        public const string PlanToWatch = "PlanToWatch";
+        public const string Watching = "Watching";
+        public const string WatchAgain = "WatchAgain";
+        public const string Bookmarked = "Bookmarked";
+
+
     }
 }

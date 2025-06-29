@@ -368,6 +368,12 @@ namespace AnimeRaider.UI.Containers{
             }
             else
             {
+                if (PublicWidgets.Searcher != null)
+                    PublicWidgets.Searcher.Hide();
+
+                if (PublicWidgets.DropDownLocalSort != null)
+                    PublicWidgets.DropDownLocalSort.Hide();
+
                 WrongHostnameTranstion.TranslateForward();
                 return;
             }
@@ -396,6 +402,9 @@ namespace AnimeRaider.UI.Containers{
 
                 if (SharedData.Data.UserData != null)
                 {
+                    if (PublicWidgets.DropDownLocalSort != null)
+                        PublicWidgets.DropDownLocalSort.Show();
+
                     if (PublicWidgets.UIHome != null)
                         PublicWidgets.TransitionForward(PublicWidgets.UIHome);
                 }
@@ -403,6 +412,8 @@ namespace AnimeRaider.UI.Containers{
                     if (WrongUsernameTranstion != null && WrongPasswordTranstion != null) {
                         WrongUsernameTranstion.TranslateForward();
                         WrongPasswordTranstion.TranslateForward();
+                        if (PublicWidgets.DropDownLocalSort != null)
+                            PublicWidgets.DropDownLocalSort.Hide();
                     }
                     
                 }

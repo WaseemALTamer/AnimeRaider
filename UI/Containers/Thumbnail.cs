@@ -625,11 +625,13 @@ namespace AnimeRaider.UI.Containers
                     EpisodeStatus.SetColor(Themes.Complete);
 
                 MenuItemComplete.Header = "UnComplete";
+                MenuItemComplete.Click -= RemoveComplete;
                 MenuItemComplete.Click += RemoveComplete;
                 MenuItemComplete.Click -= SetComplete;
             }
             else {
                 MenuItemComplete.Header = "Complete";
+                MenuItemComplete.Click -= SetComplete;
                 MenuItemComplete.Click += SetComplete;
                 MenuItemComplete.Click -= RemoveComplete;
 
@@ -644,11 +646,13 @@ namespace AnimeRaider.UI.Containers
                     EpisodeStatus.SetColor(Themes.Bookmarked);
 
                 MenuItemBookmarked.Header = "UnBookmark";
+                MenuItemBookmarked.Click -= RemoveBookmark;
                 MenuItemBookmarked.Click += RemoveBookmark;
                 MenuItemBookmarked.Click -= SetBookmark;
             }
             else {
                 MenuItemBookmarked.Header = "Bookmark";
+                MenuItemBookmarked.Click -= SetBookmark;
                 MenuItemBookmarked.Click += SetBookmark;
                 MenuItemBookmarked.Click -= RemoveBookmark;
             }

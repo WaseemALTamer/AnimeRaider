@@ -49,6 +49,15 @@ namespace AnimeRaider.UI
             set { _Searcher = value; }
         }
 
+        
+
+        private static DropDownLocalSort? _DropDownLocalSort;
+        public static DropDownLocalSort? DropDownLocalSort
+        {
+            get { return _DropDownLocalSort; }
+            set { _DropDownLocalSort = value; }
+        }
+
 
 
 
@@ -85,6 +94,13 @@ namespace AnimeRaider.UI
         public static Pages.Player? UIPlayer{
             get { return _UIPlayer; }
             set { _UIPlayer = value; }
+        }
+
+
+        private static Pages.Sorter? _UISorter;
+        public static Pages.Sorter? UISorter{
+            get { return _UISorter; }
+            set { _UISorter = value; }
         }
 
 
@@ -129,6 +145,9 @@ namespace AnimeRaider.UI
             Master.Children.Add(Searcher);
 
 
+            DropDownLocalSort = new DropDownLocalSort(Master);
+            Master.Children.Add(DropDownLocalSort);
+
 
 
             // <ASSETS END>
@@ -149,13 +168,17 @@ namespace AnimeRaider.UI
             UISeries = new Pages.Series(Master);
             Pages.Add(UISeries);
 
-            // this creates the Series Page
+            // this creates the Search Page
             UISearch = new Pages.Search(Master);
             Pages.Add(UISearch);
 
             // this creates the Player Page
             UIPlayer = new Pages.Player(Master);
             Pages.Add(UIPlayer);
+
+            // this creates the Sorter Page
+            UISorter = new Pages.Sorter(Master);
+            Pages.Add(UISorter);
 
 
             // <PAGES END>

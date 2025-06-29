@@ -29,6 +29,8 @@ namespace AnimeRaider.Setting{
         public static SolidColorBrush Entry = new SolidColorBrush(Color.FromUInt32(0xff000000));
         public static SolidColorBrush Text = new SolidColorBrush(Color.FromUInt32(0xffffffff));
         public static SolidColorBrush Timer = new SolidColorBrush(Color.FromUInt32(0xffffffff));
+        public static SolidColorBrush DropDown = new SolidColorBrush(Color.FromUInt32(0xff000000));
+        public static SolidColorBrush WaterMark = new SolidColorBrush(Color.FromUInt32(0xff888888));
 
 
         public static SolidColorBrush Complete = new SolidColorBrush(Color.FromUInt32(0xff0000ff));
