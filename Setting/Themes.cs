@@ -34,7 +34,10 @@ namespace AnimeRaider.Setting{
 
 
         public static SolidColorBrush Complete = new SolidColorBrush(Color.FromUInt32(0xff0000ff));
-        public static SolidColorBrush Bookmarked = new SolidColorBrush(Color.FromUInt32(0xff00ff00));
+        public static SolidColorBrush Bookmarked = new SolidColorBrush(Color.FromUInt32(0xffffff00));
+        public static SolidColorBrush Watching = new SolidColorBrush(Color.FromUInt32(0xff00ff00));
+        public static SolidColorBrush PlanToWatch = new SolidColorBrush(Color.FromUInt32(0xffffffff));
+        public static SolidColorBrush BookmarkedEpisode = new SolidColorBrush(Color.FromUInt32(0xff00ff00));
 
     }
 }

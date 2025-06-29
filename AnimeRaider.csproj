@@ -29,9 +29,14 @@
 	</ItemGroup>
 
 
+	<ItemGroup>
+		<Content Include="Appdata\*" CopyToOutputDirectory="PreserveNewest" />
+		<Content Remove="Appdata\Appdata.cs" />
+	</ItemGroup>
+
+
 	<PropertyGroup>
 		<ApplicationIcon>Assets/Icone/Icone.ico</ApplicationIcon>
-		<!-- Set the .exe icon -->
 	</PropertyGroup>
 
 </Project>

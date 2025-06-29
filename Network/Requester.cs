@@ -139,6 +139,46 @@ namespace AnimeRaider.Network
         }
 
 
+        public static async Task<bool> CreateUser(string? username, string? password){
+
+            if (username == null ||
+                password == null) 
+                return false;
+
+            string url = Server.Domain + Server.Users + Server.Create +
+                         $"?username={username}" +
+                         $"&password={password}";
+
+            try{
+                HttpResponseMessage response = await client.GetAsync(url);
+                response.EnsureSuccessStatusCode();
+
+                string content = await response.Content.ReadAsStringAsync();
+
+                // Try to parse it as a JSON bool
+                if (bool.TryParse(content, out bool result)){
+                    return result;
+                }
+
+                if (content.Trim() == "\"true\"")
+                    return true;
+
+
+                if (content.Trim() == "\"false\"")
+                    return false;
+            }
+            catch (HttpRequestException e)
+            {
+                Console.WriteLine($"Request error: {e.Message}");
+            }
+            catch (JsonException e)
+            {
+                Console.WriteLine($"JSON parse error: {e.Message}");
+            }
+            return false;
+        }
+
+
         public static async Task<UserData?> GetUserData(string username, string password){
             string url = Server.Domain + Server.Users + Server.Data + Server.All +  "?" + "&username=" + username + "&password=" + password;
             try{

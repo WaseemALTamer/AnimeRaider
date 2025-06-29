@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using AnimeRaider.UI.Containers;
 using AnimeRaider.Structures;
 using System;
+using AnimeRaider.UI.WindowPopup;
 
 
 
@@ -107,6 +108,14 @@ namespace AnimeRaider.UI
 
 
         // <POPUPS>
+        private static CreateUser? _UICreateUserInPop;
+        public static CreateUser? UICreateUserInPop{
+            get { return _UICreateUserInPop; }
+            set { _UICreateUserInPop = value; }
+        }
+
+
+
 
 
 
@@ -185,6 +194,9 @@ namespace AnimeRaider.UI
 
 
             // <IN_POPUPS START>
+
+            // this creates the popup for Creating an account
+            UICreateUserInPop = new CreateUser(Master);
 
 
 

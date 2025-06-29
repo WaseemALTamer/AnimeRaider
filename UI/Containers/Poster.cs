@@ -8,6 +8,8 @@ using Avalonia.Input;
 using SkiaSharp;
 using System.IO;
 using Avalonia;
+using Avalonia.Interactivity;
+using AnimeRaider.UI.Containers.Common;
 
 
 
@@ -35,18 +37,22 @@ namespace AnimeRaider.UI.Containers
 
         private ContextMenu? RightClickMenu;
 
+        private MenuItem CopyNameItem = new MenuItem { Header = "Copy Name" };
+
         private MenuItem CompletedItem = new MenuItem { Header = "Completed"};
         private MenuItem WatchingItem = new MenuItem { Header = "Watching" };
-        private MenuItem PlanToWatchItem = new MenuItem { Header = "PlanToWatch"};
+        private MenuItem PlanToWatchItem = new MenuItem { Header = "Plan To Watch"};
         private MenuItem BookmarkedItem = new MenuItem { Header = "Bookmarked"};
-        private MenuItem WatchAgainItem = new MenuItem { Header = "WatchAgain"};
+        private MenuItem WatchAgainItem = new MenuItem { Header = "Watch Again"};
+
+
+        private Status? SeriesStatus;
 
 
 
 
 
-private Canvas? _MainCanvas;
-
+        private Canvas? _MainCanvas;
         public Canvas? MainCanvas
         {
             get { return _MainCanvas; }
@@ -68,8 +74,7 @@ private Canvas? _MainCanvas;
         }
 
         private Bitmap? _CoverBitmap;
-        public Bitmap? CoverBitmap
-        {
+        public Bitmap? CoverBitmap{
             get { return _CoverBitmap; }
             set { _CoverBitmap = value; }
         }
@@ -105,7 +110,7 @@ private Canvas? _MainCanvas;
                 EndingValue = 1.1,
                 CurrentValue = 1,
                 Duration = Config.TransitionHover * 3,
-                Trigger = OnHoverSetMainCanvasSize
+                Trigger = OnHoverSetCoverSize
             };
 
             PointerEntered += HoverTranslation.TranslateForward;
@@ -118,20 +123,28 @@ private Canvas? _MainCanvas;
 
             MainCanvas.Children.Add(Cover);
             //Loaded += OnLoaded; // instead  of loading  the  content when we create
-                                  // the poseter we load the content when we show the
-                                  // content 
+            // the poseter we load the content when we show the
+            // content 
 
+
+
+            SeriesStatus = new Status();
+            MainCanvas.Children.Add(SeriesStatus);
+            
 
 
             RightClickMenu = new ContextMenu {
                 ItemsSource = new[] {
-                    CompletedItem,
-                    WatchingItem,
-                    PlanToWatchItem,
-                    BookmarkedItem,
-                    WatchAgainItem
-                    }
+                        CopyNameItem,
+                        CompletedItem,
+                        WatchingItem,
+                        PlanToWatchItem,
+                        BookmarkedItem,
+                        WatchAgainItem
+                }
             };
+
+            CopyNameItem.Click += OnClickCopyName;
 
             SetStatus();
 
@@ -199,6 +212,21 @@ private Canvas? _MainCanvas;
             if (Master != null){
                 Width = 270;
                 Height = 405;
+
+
+                if (MainCanvas != null){
+                    MainCanvas.Width = Width;
+                    MainCanvas.Height = Height;
+
+                    if (SeriesStatus != null){
+                        Canvas.SetLeft(SeriesStatus, MainCanvas.Width - SeriesStatus.Width - 25);
+                        Canvas.SetTop(SeriesStatus, 25);
+                    }
+
+
+                }
+
+
             }
         }
 
@@ -232,6 +260,19 @@ private Canvas? _MainCanvas;
         }
 
 
+
+        private async void OnClickCopyName(object? sender, RoutedEventArgs args){
+            if (Series == null) return;
+            if (Series.Name == null) return;
+
+            
+            var clipboard = TopLevel.GetTopLevel(this)?.Clipboard;
+            if (clipboard == null) return;
+
+            var dataObject = new DataObject();
+            dataObject.Set(DataFormats.Text, Series.Name);
+            await clipboard.SetDataObjectAsync(dataObject);
+        }
 
 
         // COMPLETEED
@@ -417,70 +458,10 @@ private Canvas? _MainCanvas;
         public void SetStatus()
         {
             if (Series == null || SharedData.Data.UserData == null) return;
+            
+            if(SeriesStatus != null)
+                SeriesStatus.Reset();
 
-            // Completed
-            if (SharedData.Data.IsSeriesInList(Series, SharedData.Data.UserData.Completed))
-            {
-                CompletedItem.Header = "UnCompleted";
-                CompletedItem.Click -= RemoveCompleted;
-                CompletedItem.Click += RemoveCompleted;
-                CompletedItem.Click -= SetCompleted;
-            }
-            else
-            {
-                CompletedItem.Header = "Completed";
-                CompletedItem.Click -= SetCompleted;
-                CompletedItem.Click += SetCompleted;
-                CompletedItem.Click -= RemoveCompleted;
-            }
-
-            // Watching
-            if (SharedData.Data.IsSeriesInList(Series, SharedData.Data.UserData.Watching))
-            {
-                WatchingItem.Header = "UnWatching";
-                WatchingItem.Click -= RemoveWatching;
-                WatchingItem.Click += RemoveWatching;
-                WatchingItem.Click -= SetWatching;
-            }
-            else
-            {
-                WatchingItem.Header = "Watching";
-                WatchingItem.Click -= SetWatching;
-                WatchingItem.Click += SetWatching;
-                WatchingItem.Click -= RemoveWatching;
-            }
-
-            // PlanToWatch
-            if (SharedData.Data.IsSeriesInList(Series, SharedData.Data.UserData.PlanToWatch))
-            {
-                PlanToWatchItem.Header = "UnPlanToWatch";
-                PlanToWatchItem.Click -= RemovePlanToWatch;
-                PlanToWatchItem.Click += RemovePlanToWatch;
-                PlanToWatchItem.Click -= SetPlanToWatch;
-            }
-            else
-            {
-                PlanToWatchItem.Header = "PlanToWatch";
-                PlanToWatchItem.Click -= SetPlanToWatch;
-                PlanToWatchItem.Click += SetPlanToWatch;
-                PlanToWatchItem.Click -= RemovePlanToWatch;
-            }
-
-            // Bookmarked
-            if (SharedData.Data.IsSeriesInList(Series, SharedData.Data.UserData.Bookmarked))
-            {
-                BookmarkedItem.Header = "UnBookmarked";
-                BookmarkedItem.Click -= RemoveBookmarked;
-                BookmarkedItem.Click += RemoveBookmarked;
-                BookmarkedItem.Click -= SetBookmarked;
-            }
-            else
-            {
-                BookmarkedItem.Header = "Bookmarked";
-                BookmarkedItem.Click -= SetBookmarked;
-                BookmarkedItem.Click += SetBookmarked;
-                BookmarkedItem.Click -= RemoveBookmarked;
-            }
 
             // WatchAgain
             if (SharedData.Data.IsSeriesInList(Series, SharedData.Data.UserData.WatchAgain))
@@ -497,6 +478,80 @@ private Canvas? _MainCanvas;
                 WatchAgainItem.Click += SetWatchAgain;
                 WatchAgainItem.Click -= RemoveWatchAgain;
             }
+
+            // PlanToWatch
+            if (SharedData.Data.IsSeriesInList(Series, SharedData.Data.UserData.PlanToWatch))
+            {
+                PlanToWatchItem.Header = "UnPlanToWatch";
+                PlanToWatchItem.Click -= RemovePlanToWatch;
+                PlanToWatchItem.Click += RemovePlanToWatch;
+                PlanToWatchItem.Click -= SetPlanToWatch;
+                if (SeriesStatus != null)
+                    SeriesStatus.SetColor(Themes.PlanToWatch);
+            }
+            else
+            {
+                PlanToWatchItem.Header = "PlanToWatch";
+                PlanToWatchItem.Click -= SetPlanToWatch;
+                PlanToWatchItem.Click += SetPlanToWatch;
+                PlanToWatchItem.Click -= RemovePlanToWatch;
+            }
+
+            // Watching
+            if (SharedData.Data.IsSeriesInList(Series, SharedData.Data.UserData.Watching))
+            {
+                WatchingItem.Header = "UnWatching";
+                WatchingItem.Click -= RemoveWatching;
+                WatchingItem.Click += RemoveWatching;
+                WatchingItem.Click -= SetWatching;
+                if (SeriesStatus != null)
+                    SeriesStatus.SetColor(Themes.Watching);
+            }
+            else
+            {
+                WatchingItem.Header = "Watching";
+                WatchingItem.Click -= SetWatching;
+                WatchingItem.Click += SetWatching;
+                WatchingItem.Click -= RemoveWatching;
+            }
+
+            // Completed
+            if (SharedData.Data.IsSeriesInList(Series, SharedData.Data.UserData.Completed))
+            {
+                CompletedItem.Header = "UnCompleted";
+                CompletedItem.Click -= RemoveCompleted;
+                CompletedItem.Click += RemoveCompleted;
+                CompletedItem.Click -= SetCompleted;
+                if (SeriesStatus != null)
+                    SeriesStatus.SetColor(Themes.Complete);
+            }
+            else
+            {
+                CompletedItem.Header = "Completed";
+                CompletedItem.Click -= SetCompleted;
+                CompletedItem.Click += SetCompleted;
+                CompletedItem.Click -= RemoveCompleted;
+            }
+
+            // Bookmarked
+            if (SharedData.Data.IsSeriesInList(Series, SharedData.Data.UserData.Bookmarked))
+            {
+                BookmarkedItem.Header = "UnBookmarked";
+                BookmarkedItem.Click -= RemoveBookmarked;
+                BookmarkedItem.Click += RemoveBookmarked;
+                BookmarkedItem.Click -= SetBookmarked;
+                if (SeriesStatus != null)
+                    SeriesStatus.SetColor(Themes.Bookmarked);
+            }
+            else
+            {
+                BookmarkedItem.Header = "Bookmarked";
+                BookmarkedItem.Click -= SetBookmarked;
+                BookmarkedItem.Click += SetBookmarked;
+                BookmarkedItem.Click -= RemoveBookmarked;
+            }
+
+
         }
 
 
@@ -608,18 +663,18 @@ private Canvas? _MainCanvas;
         }
 
 
-        public void OnHoverSetMainCanvasSize(double Value){
-            if (MainCanvas != null){
-                MainCanvas.Width = Width * Value;
-                MainCanvas.Height = Height * Value;
+        public void OnHoverSetCoverSize(double Value){
 
-                if (Cover != null) { 
-                    Cover.Width = Width * Value;
-                    Cover.Height = Height * Value;
+            if (Cover != null) { 
+                Cover.Width = Width * Value;
+                Cover.Height = Height * Value;
+
+                if (MainCanvas != null){
+                    Canvas.SetLeft(Cover, (MainCanvas.Width - Cover.Width) / 2);
+                    Canvas.SetTop(Cover, (MainCanvas.Height - Cover.Height) / 2);
                 }
-
-
             }
+
 
         }
 

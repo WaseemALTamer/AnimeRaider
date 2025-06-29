@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
+
+
 
 namespace AnimeRaider.Network
 {
@@ -11,7 +9,7 @@ namespace AnimeRaider.Network
         // this class will just provide Domain data for the database
 
 
-        public static string Domain = "http://192.168.1.51:8000/";
+        public static string Domain = "";
 
         // General
         public const string Ping = "ping";

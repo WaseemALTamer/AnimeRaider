@@ -643,7 +643,7 @@ namespace AnimeRaider.UI.Containers
                 ))
             {
                 if (EpisodeStatus != null)
-                    EpisodeStatus.SetColor(Themes.Bookmarked);
+                    EpisodeStatus.SetColor(Themes.BookmarkedEpisode);
 
                 MenuItemBookmarked.Header = "UnBookmark";
                 MenuItemBookmarked.Click -= RemoveBookmark;

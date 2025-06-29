@@ -4,6 +4,7 @@ using AnimeRaider.Setting;
 using Avalonia.Controls;
 using AnimeRaider.UI;
 using System;
+using AnimeRaider.Structures;
 
 
 
@@ -36,6 +37,7 @@ namespace AnimeRaider
             while (double.IsNaN(Width) || double.IsNaN(Height)) await Task.Delay(1);
 
 
+
             MainCanvas = new Canvas
             { // now we create the canvase after we load up for preformece
                 Width = Width,
@@ -66,6 +68,15 @@ namespace AnimeRaider
 
 
         private void OnClickExit(object? sender, object? e) {
+
+            Credentials credentials = new Credentials { 
+                Domain = Network.Server.Domain,
+                Username = SharedData.Data.Username,
+                Password = SharedData.Data.Password,
+            };
+
+            Appdata.SaveConfig(credentials);
+
             Environment.Exit(0);
         }
     }

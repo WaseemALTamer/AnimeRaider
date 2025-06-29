@@ -99,7 +99,7 @@ namespace AnimeRaider.UI.WindowPopup
             MinHeight = 210;
 
             MaxWidth = 715;
-            MaxHeight = 250;
+            MaxHeight = 300;
 
 
 
@@ -134,8 +134,8 @@ namespace AnimeRaider.UI.WindowPopup
         private void OnResize(object? sender = null, SizeChangedEventArgs? e = null)
         {
             if (Master != null){
-                Width = Master.Width * 0.50;
-                Height = Master.Height * 0.35;
+                Width = Master.Width * 0.5;
+                Height = Master.Height * 0.4;
 
                 // also the ui will stop at the given min width our Width and height will still be
                 // assigned and it wont correct it self this if  statment  will attempt to correct

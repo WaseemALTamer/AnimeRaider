@@ -1,92 +1,34 @@
-﻿using Avalonia.Interactivity;
-using AnimeRaider.Setting;
-using Avalonia.Controls;
-using Avalonia.Media;
-using Avalonia.Input;
+﻿using AnimeRaider.Setting;
 using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Input;
+using Avalonia.Interactivity;
+using Avalonia.Media;
 
 
-
-
-
-
-
-
-namespace AnimeRaider.UI.Containers{
-
-
-    public class Connector : Border
+namespace AnimeRaider.UI.WindowPopup
+{
+    public class CreateUser: Base
     {
-
-
-        private Canvas? Master;
-
-        private Canvas? _MainCanvas;
-        public Canvas? MainCanvas{
-            get { return _MainCanvas; }
-            set { _MainCanvas = value; }
-        }
-
-
-
-        private Image? CredentialsImage;
-
-        private Button? ConnectButton;
-        private Button? CreateButton;
-
-        private TextBox? HostAdressEntry;
-        private TextBox? UsernameEntry;
-        private TextBox? PasswordEntry;
-
 
         private Animations.Transations.Uniform? WrongHostnameTranstion;
         private Animations.Transations.Uniform? WrongUsernameTranstion;
         private Animations.Transations.Uniform? WrongPasswordTranstion;
 
-        public Connector(Canvas? master) {
 
-            Master = master;
+        private TextBox? HostAdressEntry;
+        private TextBox? UsernameEntry;
+        private TextBox? PasswordEntry;
 
-            Opacity = 1;
-            ClipToBounds = true;
-            Background = Themes.Holder;
-            CornerRadius = new CornerRadius(Config.CornerRadius);
+        private Button? CreateButton;
 
+        public CreateUser(Canvas master) : base(master)
+        {
 
-            MainCanvas = new Canvas{
-                ClipToBounds=true,
-            };
-            Child = MainCanvas;
+            if (MainCanvas == null) return;
 
-            ConnectButton = new Button{
-                Content = "Connect",
-                Width = 300,
-                Height = 50,
-                Background = Themes.Button,
-                HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center,
-                VerticalContentAlignment = Avalonia.Layout.VerticalAlignment.Center,
-                FontSize = Config.FontSize,
-                CornerRadius = new CornerRadius(Config.CornerRadius)
-            };
-            MainCanvas.Children.Add(ConnectButton);
-            ConnectButton.Click += OnClickConnectButton;
-
-
-            CreateButton = new Button{
-                Content = "Create Account",
-                Width = 300,
-                Height = 50,
-                Background = Themes.Button,
-                HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center,
-                VerticalContentAlignment = Avalonia.Layout.VerticalAlignment.Center,
-                FontSize = Config.FontSize,
-                CornerRadius = new CornerRadius(Config.CornerRadius)
-            };
-            MainCanvas.Children.Add(CreateButton);
-            CreateButton.Click += OnClickCreateButton;
-
-
-            HostAdressEntry = new TextBox{
+            HostAdressEntry = new TextBox
+            {
                 Text = "",
                 Width = 300,
                 Height = 40,
@@ -127,24 +69,24 @@ namespace AnimeRaider.UI.Containers{
             PasswordEntry.KeyDown += OnEnetryKeyDown;
 
 
-            if (Appdata.Credentials != null){
 
-                if (Appdata.Credentials.Domain != null &&
-                    Appdata.Credentials.Username != null &&
-                    Appdata.Credentials.Password != null)
-                {
-                    Network.Server.Domain = Appdata.Credentials.Domain;
-                    SharedData.Data.Username = Appdata.Credentials.Username;
-                    SharedData.Data.Password = Appdata.Credentials.Password;
+            CreateButton = new Button
+            {
+                Content = "Create Account",
+                Width = 300,
+                Height = 50,
+                Background = Themes.Button,
+                HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center,
+                VerticalContentAlignment = Avalonia.Layout.VerticalAlignment.Center,
+                FontSize = Config.FontSize,
+                CornerRadius = new CornerRadius(Config.CornerRadius)
+            };
+            MainCanvas.Children.Add(CreateButton);
+            CreateButton.Click += OnClickCreateButton;
 
-                    HostAdressEntry.Text = Network.Server.Domain;
-                    UsernameEntry.Text = SharedData.Data.Username;
-                    PasswordEntry.Text = SharedData.Data.Password;
-                }
-            }
 
-
-            WrongHostnameTranstion = new Animations.Transations.Uniform{
+            WrongHostnameTranstion = new Animations.Transations.Uniform
+            {
                 StartingValue = 0,
                 EndingValue = 1,
                 Duration = Config.TransitionDuration,
@@ -168,73 +110,59 @@ namespace AnimeRaider.UI.Containers{
                 Trigger = TriggerWrongPassword,
             };
 
-            CredentialsImage = new Image{
-                Width = 200, Height = 200,
-            };
 
-            MainCanvas.Children.Add(CredentialsImage);
-
-            Assets.AddAwaitedActions(() => {
-                CredentialsImage.Source = Assets.CredentialsBitmap;
-            });
+            MinHeight = 270;
+            
 
             OnSizeChanged();
-
-            if (Master != null){
-                //Master.SizeChanged += OnSizeChanged;
-            }
+            MainCanvas.SizeChanged += OnSizeChanged;
 
         }
 
-        public void OnSizeChanged(object? sender = null, SizeChangedEventArgs? e = null){
 
-            if (Master == null) return;
+        private void OnSizeChanged(object? sender = null, SizeChangedEventArgs? e = null) {
+            if (MainCanvas == null) return;
 
-            Width = 400;
-            Height = 550;
-
-
-            if (MainCanvas != null){
+            if (MainCanvas != null)
+            {
                 MainCanvas.Width = Width;
                 MainCanvas.Height = Height;
 
-                if (CredentialsImage != null) {
-                    Canvas.SetLeft(CredentialsImage, (MainCanvas.Width - CredentialsImage.Width) / 2);
-                    Canvas.SetTop(CredentialsImage,  25);
-                }
 
-                if (HostAdressEntry != null){
+
+
+
+
+                if (HostAdressEntry != null)
+                {
                     Canvas.SetLeft(HostAdressEntry, (MainCanvas.Width - HostAdressEntry.Width) / 2);
-                    Canvas.SetTop(HostAdressEntry, 250);
+                    Canvas.SetTop(HostAdressEntry, 25);
                 }
 
-                if (UsernameEntry != null){
+                if (UsernameEntry != null)
+                {
                     Canvas.SetLeft(UsernameEntry, (MainCanvas.Width - UsernameEntry.Width) / 2);
-                    Canvas.SetTop(UsernameEntry, 320);
+                    Canvas.SetTop(UsernameEntry, 95);
                 }
 
-                if (PasswordEntry != null){
+                if (PasswordEntry != null)
+                {
                     Canvas.SetLeft(PasswordEntry, (MainCanvas.Width - PasswordEntry.Width) / 2);
-                    Canvas.SetTop(PasswordEntry, 370);
+                    Canvas.SetTop(PasswordEntry, 145);
                 }
 
-                if (ConnectButton != null)
-                {
-                    Canvas.SetLeft(ConnectButton, (MainCanvas.Width - ConnectButton.Width) / 2);
-                    Canvas.SetTop(ConnectButton, (MainCanvas.Height - ConnectButton.Height) - 70);
-                }
-
-                if (CreateButton != null)
-                {
+                if (CreateButton != null){
                     Canvas.SetLeft(CreateButton, (MainCanvas.Width - CreateButton.Width) / 2);
-                    Canvas.SetTop(CreateButton, (MainCanvas.Height - CreateButton.Height) - 10);
+                    Canvas.SetTop(CreateButton, MainCanvas.Height  - CreateButton.Height - 10);
                 }
 
             }
+
         }
 
 
-        private void TriggerWrongHostname(double value){
+        private void TriggerWrongHostname(double value)
+        {
             if (Background is SolidColorBrush solidBrush)
             {
                 var originalColorEntry = Themes.Entry;
@@ -368,7 +296,8 @@ namespace AnimeRaider.UI.Containers{
         }
 
 
-        private void OnEnetryKeyDown(object? sender, KeyEventArgs? e){
+        private void OnEnetryKeyDown(object? sender, KeyEventArgs? e)
+        {
             // this will  detect when  a key  is pressed  for the entery
             // this will be used to detect when the enter key is pressed
             // to trigger the Accept function
@@ -376,97 +305,64 @@ namespace AnimeRaider.UI.Containers{
             if (e == null) return;
 
             if (e.Key == Key.Enter){
-                OnClickConnectButton(null, null); // simulate clicking the accept button
+                OnClickCreateButton(null, null);
             }
         }
 
 
-        private async void OnClickConnectButton(object? sender = null, RoutedEventArgs? e = null){
-            if (WrongHostnameTranstion == null) return;
-            if (HostAdressEntry == null || HostAdressEntry.Text == null) {
-                WrongHostnameTranstion.TranslateForward();
+        public async void OnClickCreateButton(object? sender = null, RoutedEventArgs? e = null){
+
+            if (HostAdressEntry == null || HostAdressEntry.Text == null || HostAdressEntry.Text == "") {
+                if (WrongHostnameTranstion != null)
+                    WrongHostnameTranstion.TranslateForward();
                 return;
             }
+            
 
+
+            Network.Server.Domain = HostAdressEntry.Text;
             if (HostAdressEntry.Text[^1] != '/'){
                 HostAdressEntry.Text += "/";
             }
+            bool result;
 
-            Network.Server.Domain = HostAdressEntry.Text;
-            bool result = await Network.Requester.GetPing();
-            if (result)
-            {
-                if (PublicWidgets.Searcher != null)
-                    PublicWidgets.Searcher.Show();
-
-
-                //if (PublicWidgets.UIHome != null)
-                //    PublicWidgets.TransitionForward(PublicWidgets.UIHome);
-            }
-            else
-            {
-                if (PublicWidgets.Searcher != null)
-                    PublicWidgets.Searcher.Hide();
-
-                if (PublicWidgets.DropDownLocalSort != null)
-                    PublicWidgets.DropDownLocalSort.Hide();
-
-                WrongHostnameTranstion.TranslateForward();
+            // check the server is online
+            result = await Network.Requester.GetPing();
+            if (!result){
+                if (WrongHostnameTranstion != null)
+                    WrongHostnameTranstion.TranslateForward();
                 return;
             }
 
+            if (UsernameEntry == null ||  PasswordEntry == null) return;
 
-            if (UsernameEntry != null &&
-                PasswordEntry != null &&
-                UsernameEntry.Text != null &&
-                PasswordEntry.Text != null) 
+            if (UsernameEntry.Text == null || UsernameEntry.Text == "") {
+                if (WrongUsernameTranstion != null)
+                    WrongUsernameTranstion.TranslateForward();
+                return;
+            }
+
+            if (PasswordEntry.Text == null || PasswordEntry.Text == ""){
+                if (WrongPasswordTranstion != null)
+                    WrongPasswordTranstion.TranslateForward();
+                return;
+            }
+
+            result = await Network.Requester.CreateUser(UsernameEntry.Text, PasswordEntry.Text);
+            if (result)
             {
-                if (UsernameEntry.Text == "" && PasswordEntry.Text == "") {
-                    SharedData.Data.Username = UsernameEntry.Text;
-                    SharedData.Data.Password = PasswordEntry.Text;
-                    SharedData.Data.UserData = null;
-
-                    if (PublicWidgets.UIHome != null)
-                        PublicWidgets.TransitionForward(PublicWidgets.UIHome);
-                    return;
-                }
-
-
-                SharedData.Data.Username = UsernameEntry.Text;
-                SharedData.Data.Password = PasswordEntry.Text;
-
-                SharedData.Data.UserData = await Network.Requester.GetUserData(UsernameEntry.Text, PasswordEntry.Text);
-
-                if (SharedData.Data.UserData != null)
-                {
-                    if (PublicWidgets.DropDownLocalSort != null)
-                        PublicWidgets.DropDownLocalSort.Show();
-
-                    if (PublicWidgets.UIHome != null)
-                        PublicWidgets.TransitionForward(PublicWidgets.UIHome);
-                }
-                else {
-                    if (WrongUsernameTranstion != null && WrongPasswordTranstion != null) {
-                        WrongUsernameTranstion.TranslateForward();
-                        WrongPasswordTranstion.TranslateForward();
-                        if (PublicWidgets.DropDownLocalSort != null)
-                            PublicWidgets.DropDownLocalSort.Hide();
-                    }
-                    
-                }
-
+                HideRight();
+            }
+            else {
+                if (WrongHostnameTranstion != null)
+                    WrongHostnameTranstion.TranslateForward();
+                if (WrongUsernameTranstion != null)
+                    WrongUsernameTranstion.TranslateForward();
+                if (WrongPasswordTranstion != null)
+                    WrongPasswordTranstion.TranslateForward();
             }
 
         }
-
-
-
-        public void OnClickCreateButton(object? sender = null, RoutedEventArgs? e = null) {
-            if (PublicWidgets.UICreateUserInPop != null)
-                PublicWidgets.UICreateUserInPop.Show();
-
-        }
-
 
 
     }
