@@ -1,10 +1,11 @@
 ﻿using Avalonia.Interactivity;
 using System.Threading.Tasks;
+using AnimeRaider.Structures;
 using AnimeRaider.Setting;
 using Avalonia.Controls;
 using AnimeRaider.UI;
 using System;
-using AnimeRaider.Structures;
+
 
 
 
@@ -75,7 +76,7 @@ namespace AnimeRaider
                 Password = SharedData.Data.Password,
             };
 
-            Appdata.SaveConfig(credentials);
+            AppData.SaveConfig(credentials);
 
             Environment.Exit(0);
         }

@@ -202,6 +202,7 @@ namespace AnimeRaider.UI.Pages
         private void ShowThumbnailsVisaibleOnly(){
             if (ScrollViewer == null) return;
             if (ThumbnailsBorder == null) return;
+            if (ThumbnailsCanvas  == null) return;
 
             double ScrollViwerYOffset = ScrollViewer.Offset.Y;
 
@@ -212,9 +213,20 @@ namespace AnimeRaider.UI.Pages
                 double _LowerBounds = ScrollViwerYOffset - thumbnail.Height;
                 double _UpperBounds = ScrollViwerYOffset + Height;
 
-                
 
-                double Ypos = Canvas.GetTop(thumbnail) + Canvas.GetTop(ThumbnailsBorder);
+
+                double _SpacePerCover = ThumbnailsCanvas.Width / (thumbnail.Width + PadX);
+                double _ColumnsNum = Math.Floor(_SpacePerCover);
+                double _LeftSpace = (_SpacePerCover - _ColumnsNum) * (thumbnail.Width + PadX);
+                double _RowNum = Math.Floor(i / _ColumnsNum);
+                double _extraspace = (_LeftSpace - PadX) / 2;
+
+                double _PosX = (PadX * (i % _ColumnsNum)) + (thumbnail.Width * (i % _ColumnsNum)) + PadX + _extraspace;
+                double _PosY = (PadY * ((_RowNum) + 1)) + (thumbnail.Height * (_RowNum));
+
+
+
+                double Ypos = _PosY + Canvas.GetTop(ThumbnailsBorder);
                 if (Ypos > _LowerBounds && Ypos < _UpperBounds) {
                     thumbnail.IsVisible = true;
                     thumbnail.Show();

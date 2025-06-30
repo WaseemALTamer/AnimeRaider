@@ -11,7 +11,6 @@ using System.IO;
 using SkiaSharp;
 using Avalonia;
 using System;
-using Avalonia.Interactivity;
 
 
 
@@ -37,7 +36,7 @@ namespace AnimeRaider.UI.Containers
 
         private Animations.Transations.EaseInOut? HoverTranslationPlayIcone;
         private Animations.Transations.EaseInOut? HoverTranslationCover;
-        private Animations.Transations.EaseInOut? PostionTranslation;
+        private Animations.Transations.Uniform? PostionTranslation;
         private Animations.Transations.Uniform? ShowHideTransition;
 
 
@@ -426,53 +425,58 @@ namespace AnimeRaider.UI.Containers
 
         private Vector InitialPos;
         private Vector FinalPos;
-        public void SetPostionTranslate(double Xpos, double Ypos)
-        {
 
-            if (PostionTranslation != null && PostionTranslation.FunctionRunning)
-            {
-                FinalPos = new Vector(Xpos, Ypos);
-                return;
+        private double LastVlaue; // this will be used for clamping the last frame for smother transitions
+
+        public void SetPostionTranslate(double Xpos, double Ypos){
+            if (PostionTranslation != null && PostionTranslation.FunctionRunning){
+                PostionTranslation.Pause();
+                PostionTranslation.Reset();
             };
 
-            if (Canvas.GetLeft(this) == Xpos && Canvas.GetTop(this) == Ypos)
-            {
-                return;
-            }
 
-            if (Canvas.GetTop(this) == Ypos || IsVisible == false)
-            {
+
+            if (double.IsNaN(Canvas.GetLeft(this))){
+                // this will only occures on start up
                 Canvas.SetLeft(this, Xpos);
                 Canvas.SetTop(this, Ypos);
                 return;
             }
 
+            Vector newFinal = new Vector(Xpos, Ypos);
 
+            if (FinalPos == newFinal) return;
 
-            PostionTranslation = new Animations.Transations.EaseInOut
-            {
-                StartingValue = 0,
-                EndingValue = 1,
-                Duration = Config.TransitionDuration,
-                Trigger = SetPostionTrigger
-            };
-
-            if (double.IsNaN(Canvas.GetLeft(this)))
-            { // this will only occures on start up
-                Canvas.SetLeft(this, Xpos);
-                Canvas.SetTop(this, Ypos);
-                return;
-            }
 
             InitialPos = new Vector(Canvas.GetLeft(this), Canvas.GetTop(this));
-            FinalPos = new Vector(Xpos, Ypos);
+            FinalPos = newFinal;
+            Vector delta = FinalPos - InitialPos;
+
+
+
+            if (delta.Length < 10){
+                Canvas.SetLeft(this, Xpos);
+                Canvas.SetTop(this, Ypos);
+                return;
+            }
+
+            LastVlaue = 0;
+            PostionTranslation = new Animations.Transations.Uniform{
+                StartingValue = 0,
+                EndingValue = 1,
+                Duration = Config.TransitionDuration * (delta.Length / Config.TransitionReferenceDistance),
+                Trigger = SetPostionTrigger
+            };
 
             PostionTranslation.TranslateForward();
         }
 
         private void SetPostionTrigger(double value){
-            Canvas.SetLeft(this, InitialPos.X + (FinalPos.X - InitialPos.X) * value);
-            Canvas.SetTop(this, InitialPos.Y + (FinalPos.Y - InitialPos.Y) * value);
+            if (value > LastVlaue){
+                LastVlaue = value;
+                Canvas.SetLeft(this, InitialPos.X + (FinalPos.X - InitialPos.X) * value);
+                Canvas.SetTop(this, InitialPos.Y + (FinalPos.Y - InitialPos.Y) * value);
+            }
         }
 
 

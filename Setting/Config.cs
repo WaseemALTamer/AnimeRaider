@@ -24,6 +24,9 @@ namespace AnimeRaider.Setting
         public static int TransitionHover = 100; // this is used for a hover  effect  duration,
                                                  // the time is in ms
 
+        public static int TransitionReferenceDistance = 1000; // this will be used for animation that
+                                                             // vary in distance
+
 
         public static int CornerRadius = 10;     // this value is used for the Holder corner Radius
                                                  // this is a generic var that anycontainer can use

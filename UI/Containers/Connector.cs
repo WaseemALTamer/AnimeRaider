@@ -127,15 +127,15 @@ namespace AnimeRaider.UI.Containers{
             PasswordEntry.KeyDown += OnEnetryKeyDown;
 
 
-            if (Appdata.Credentials != null){
+            if (AppData.Credentials != null){
 
-                if (Appdata.Credentials.Domain != null &&
-                    Appdata.Credentials.Username != null &&
-                    Appdata.Credentials.Password != null)
+                if (AppData.Credentials.Domain != null &&
+                    AppData.Credentials.Username != null &&
+                    AppData.Credentials.Password != null)
                 {
-                    Network.Server.Domain = Appdata.Credentials.Domain;
-                    SharedData.Data.Username = Appdata.Credentials.Username;
-                    SharedData.Data.Password = Appdata.Credentials.Password;
+                    Network.Server.Domain = AppData.Credentials.Domain;
+                    SharedData.Data.Username = AppData.Credentials.Username;
+                    SharedData.Data.Password = AppData.Credentials.Password;
 
                     HostAdressEntry.Text = Network.Server.Domain;
                     UsernameEntry.Text = SharedData.Data.Username;
