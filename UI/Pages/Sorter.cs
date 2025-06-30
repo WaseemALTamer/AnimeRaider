@@ -39,20 +39,27 @@ namespace AnimeRaider.UI.Pages
         }
 
 
+        bool UpdateRunning = false;
+
         public async void Update(List<Structures.Series> SeriesList){
+
+            // a more optimal approch should be used
+            if (UpdateRunning){
+                UpdateRunning = false;
+                await Task.Delay(100);
+            }
+
             RemoveAllPosters();
-
-
-
-
+            UpdateRunning = true;
             if (SeriesList != null){
 
                 for (int i = 0; i < SeriesList.Count; i++){
+                    if (!UpdateRunning) return; 
+
                     Poster poster = new Poster(MainCanvas, SeriesList[i]);
                     Posters.Add(poster);
 
-                    if (MainCanvas != null)
-                    {
+                    if (MainCanvas != null){
                         MainCanvas.Children.Add(poster);
                     }
 
