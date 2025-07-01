@@ -9,7 +9,7 @@ namespace AnimeRaider
 {
     public static class AppData
     {
-        public static string CredentialsPath = $"Appdata/SavedUser.json";
+        public static string CredentialsPath = $"AppData/SavedUser.json";
         public static Credentials? Credentials = LoadSavedUserData();
 
 
